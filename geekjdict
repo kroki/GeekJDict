@@ -1,0 +1,683 @@
+#! /usr/bin/env perl
+# -*- Perl encoding: utf-8 -*-
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+GeekJDict - text-mode Japanese dictionary with powerful input and lookup
+
+=head1 SYNOPSIS
+
+  geekjdict [USER INTERFACE OPTIONS]
+  geekjdict --update=TYPE [UPDATE OPTIONS] FILE(S)
+  geekjdict --help
+
+=head1 DESCRIPTION
+
+GeekJDict is a text-mode Japanese dictionary with powerful input and
+lookup capabilities.  To run it requires the terminal that supports
+UTF-8 and at least 16 ANSI colors (C<w> command requires 256 ANSI
+colors), and terminal font that has Japanese glyphs.  Most terminal
+emulators in graphic desktop environments of modern OS distributions
+comply with these requirements out of the box.
+
+GeekJDict can provide dictionary information about Japanese words and
+expressions as well as individual kanji, and can show handwriting of
+selected characters.  GeekJDict implements powerful glob pattern
+lookup, direct hiragana and katakana input, and direct kanji input via
+built-in support for Cangjie input method with glob patterns and
+completion.
+
+It is advised to run GeekJDict in a separate terminal window with
+enlarged font (and black background).  For instance the author runs it
+as
+
+  gnome-terminal --zoom=2 --command geekjdict
+
+=head2 Commands
+
+When GeekJDict shows input prompt you may type in the query to lookup.
+For instance
+
+  geekjdict>> Japanese language
+
+will show all dictionary entries that have both "Japanese" and
+"language" words in them.  By word we mean a sequence of alphanumeric
+and ideographic characters plus a few Japanese-specific symbols (like
+repetition and prolongation marks, etc., and a few more).  Words are
+matched in any order, the search is case-insensitive ("a" and "A",
+etc. are equal), and diacritical marks do not count as difference
+(i.e. "aàâãä...", etc. are all equal).
+
+When the output is longer than one screen it is piped to C<less>
+program (use C<q> key to quit it, type C<h> key there to see other
+C<less> commands).
+
+You may use glob patterns (described below) instead of words.  For instance
+
+  geekjdict>> *気*[^あ-ん] feel*
+
+will find all entries that have "気" somewhere in the word that
+doesn't end in hiragana, and there's also a word that starts with
+"feel".  Note that several glob patterns may match the very same word,
+and there may also be non-matching words in the dictionary entry of
+course.
+
+You can also type one of the commands described below (command names
+are case-sensitive):
+
+=over
+
+=item C<t [TAG...]>
+
+Show tags description.  You may provide one or more tags (or none to
+see descriptions for all tags).  Tags may be separated by any symbols,
+so it's always possible to copy-paste (with mouse) tags from the
+previous output.  For instance the first entry of the "Japanese
+language" query has "n; adj-no" before the first sense, so now we may
+type
+
+  geekjdict>> t n; adj-no
+
+to see what it all means.
+
+=item C<k KANJI...>
+
+Show information about individual kanji.  It includes the number of
+strokes, kanji radical, Japanese school grade this kanji is taught in,
+relative frequency (out of 2,501 most frequent kanji), Cangjie
+code(s), readings (on'yomi, kun'yomi and nanori), and kanji meanings.
+For example type
+
+  geekjdict>> k 日本語
+
+=item C<w CHAR>
+
+Show stroke-by-stroke kanji or kana handwriting.  Use C<SPACE> or
+C<PageUP>/C<PageDown> keys to navigate through individual frames.  Red
+dot marks the originating point of the stroke.  The "graphics" is
+coarse but nevertheless is quite discernible.  For example type
+
+  geekjdict>> w 語
+
+and press C<SPACE> key until the writing is complete.
+
+=item C<h [GLOB...]>
+
+Show command history.  Note that commands starting with whitespace are
+not saved in the history.  C<h> commands are saved (and thus
+accessible with, say, C<Up>/C<Down> arrow keys), but are not shown in
+the output.  When one or more glob patterns are provided only matching
+entries are shown.  For example
+
+  geekjdict>> h [*?[]*
+
+will show history entries that start with a glob ("*", "?", or "[").
+
+Command history is not stored permanently, i.e. each time you run
+GeekJDict it is started anew.
+
+=item C<q>
+
+Quit GeekJDict.
+
+=back
+
+If you want to search for a command letter instead use upper case.
+For instance to search for "q" type
+
+  geekjdict>> Q
+
+since the search is case-insensitive.  You may also type
+
+  geekjdict>> [q]
+
+but queries that begin with a glob may take a bit longer to execute.
+
+=head2 Kana input
+
+Since GeekJDict is primarily meant to lookup Japanese words there must
+be a way to input them.  GeekJDict doesn't implement romaji lookups,
+but instead provides kana input capability.  GeekJDict uses a mix of
+L<Hepburn|https://en.wikipedia.org/wiki/Hepburn_romanization> and
+L<Nihon-shiki|https://en.wikipedia.org/wiki/Nihon-shiki_romanization>
+romanizations, with the constraint that each kana character has
+exactly one romaji spelling (so that conversions between alphabets are
+always unambiguous).  All spellings are natural, except for づ and ぢ
+which are spelled "dzu" and "dji" respectively.
+
+There are three input modes corresponding to Latin, hiragana and
+katakana alphabets, and enabled by C<M-g>, C<M-h> and C<M-k> keys
+respectively (here C<M> is a "Meta" key, which normally coincides with
+"Alt" key, and mnemonics for "g", "h" and "k" are the first letter of
+the prompt).  GeekJDict starts in Latin mode, and the prompt is
+
+  geekjdict>>
+
+Now if you press C<M-h> the prompt will change to
+
+  hiragana>>>
+
+and you are ready to input Japanese.  Below is an example of input for
+"hassha":
+
+  what is typed | what is shown in the input line
+  --------------+--------------------------------
+             h  |  hiragana>>> h
+             a  |  hiragana>>> は
+             s  |  hiragana>>> はs
+             s  |  hiragana>>> はss
+             h  |  hiragana>>> はssh
+             a  |  hiragana>>> はっしゃ
+
+When you type in "n" it is immediately converted to "ん".  However if
+you then type in a vowel (one of "a", "i", "u", "e", "o", or "ya",
+"yu", "yo"), then "ん" will be converted to something else.  For
+instance ("nana"):
+
+  what is typed | what is shown in the input line
+  --------------+--------------------------------
+             n  |  hiragana>>> ん
+             a  |  hiragana>>> な
+             n  |  hiragana>>> なん
+             a  |  hiragana>>> なな
+
+Use "'" to separate "ん" from the vowel.  For instance ("nan'a"):
+
+  what is typed | what is shown in the input line
+  --------------+--------------------------------
+             n  |  hiragana>>> ん
+             a  |  hiragana>>> な
+             n  |  hiragana>>> なん
+             '  |  hiragana>>> なん'
+             a  |  hiragana>>> なんあ
+
+Katakana (C<M-k>) mode works the same way.  In both hiragana and
+katakana modes "-" is converted to "ー".
+
+If you mistyped some character (for instance you meant "shu" but
+typed "sho") you don't have to start over: use undo (C<C-_>, C<C>
+is "Control" key) to get rid of the last romaji character:
+
+  what is typed | what is shown in the input line
+  --------------+--------------------------------
+             s  |  hiragana>>> s
+             h  |  hiragana>>> sh
+             o  |  hiragana>>> しょ
+           C-_  |  hiragana>>> sh
+             u  |  hiragana>>> しゅ
+
+Note that only lower case Latin letters are converted to kana, upper
+case is used to input kanji as described in the next section (you may
+also use upper case to input Latin text without first switching to
+Latin mode with C<M-g>).
+
+Finally, there will be times when you type something in only to
+realize that you were in a different input mode than you thought you
+were.  Again, instead of starting over you may use C<M-H>, C<M-K>,
+C<M-G> keys (note the upper case "H", "K", "G") that will switch mode
+like their lower case counterparts, but in addition will also convert
+last N words in accord with the new input mode (where N is a universal
+argument and is default to 1, use C<M-digits> to provide another
+value).  For instance if you type "this is a test" in a katakana mode
+you will get
+
+  katakana>>> tヒs イs ア テst
+
+If you now press C<M-9 0 M-G> you will get intended
+
+  geekjdict>> this is a test
+
+(here argument of 90 means "convert all the words").
+
+=head2 Kanji input
+
+If you read Japanese in digital form (i.e. on the Internet or in an
+electronic document, etc.) you can simply copy-paste words to
+GeekJDict.  When you know how to pronounce the word you may input
+hiragana as described above.  However this is not possible when you
+read printed material, or see kanji on a picture or scan, or in a
+movie or anime, or in the wild, and there's no furigana, and you don't
+know the pronunciation either.
+
+For such a case GeekJDict implements L<Cangjie input
+method|https://en.wikipedia.org/wiki/Cangjie_input_method> (with a
+slight variation that "X" and "Z" codes are never used).  If you read
+Wikipedia article now (which you don't have to but which won't harm
+either) do not try to memorize any part of it, this will happen
+naturally as you use the method.  Suffices to say that Cangjie input
+method may look difficult at first, but actually isn't, and is
+superior to many alternative methods (like SKIP, "parts selection",
+mouse drawing, etc.): like in the story where a person looks for lost
+keys not where he dropped them but where there's more light,
+alternative methods may not require any learning, but most of the time
+produce so many ties that you end up eye-scanning rows of kanji to
+find the one you need.
+
+Here are the basic points of the Cangjie input method as implemented
+in GeekJDict:
+
+=over
+
+=item * Keyboard keys from "A" to "W" and "Y" (Latin letters except
+for "X" and "Z", 24 total) are assigned "basic forms" and their
+variants.  You can see the bindings by pressing C<M-C> (note the
+capital "C").
+
+=item * Cangjie code consists of one to five upper-case letters.
+
+=item * Cangjie decomposition rules are as follows (copied from
+L<Wikipedia|https://en.wikipedia.org/wiki/Cangjie_input_method#The_basic_rules>):
+
+=over
+
+=item * Direction of decomposition: left to right, top to bottom, and
+outside to inside.
+
+=item * Geometrically connected forms: take 4 Cangjie codes, namely
+the first, second, third, and last codes.
+
+=item * Geometrically unconnected forms that can be broken into two
+subforms (i.e., 你): identify the two geometrically connected subforms
+according to the direction of decomposition rules (i.e., 人 and 尔),
+then take the first and last codes of the first subform and the first,
+second, and last code of the second subform.
+
+=item * Geometrically unconnected forms that can be broken into
+multiple subforms (i.e., 謝): identify the first geometrically
+connected subform according to the direction of decomposition rules
+(i.e., 言) and take the first and last codes of that form. Next, break
+the remainder (i.e., 射) into subforms (i.e., 身 and 寸) and take the
+first and last codes of the first subform and the last code of the
+last subform.
+
+=back
+
+As you use Cangjie you will realize that these rules aren't always
+followed.  However you will get the "feel" of how to decompose kanji
+you encounter.
+
+=item * To convert Cangjie code to kanji use C<TAB> key.  For example type
+
+  geekjdict>> BBPE<TAB>
+
+and the code will be replaced with 愛.
+
+=item * Shorter Cangjie code may represent kanji on its own while also
+being a prefix for a longer Cangjie codes.  For instance "AM" is the
+code for 旦, while there's also codes "AMAM", "AMG" and other.  To
+break the tie type "/" at the code end.  For example
+
+  geekjdict>> AM/<TAB>
+
+will produce 旦.
+
+=item * A few Cangjie codes represent several kanji.  To break the tie
+append a variant number to the code ("/" may be used for readability).
+For instance
+
+  geekjdict>> K2<TAB>
+
+or
+
+  geekjdict>> K/2<TAB>
+
+will yield 乂.  You could also use "AM/1" or "AM1" above even if
+there's only one kanji for "AM" code.
+
+=item * As you probably guessed already C<TAB> is a completion key.
+You may type in partial Cangjie code, press C<TAB> and see what next
+key you may use.  For instance when you type
+
+  geekjdict>> AM<TAB>
+
+you will get possible variants for the next key:
+
+  /  旦  BI 曇  D   2  IG 晊  K   2  O   3  S   2  Y   2
+  AM 晅  CW 晒  G  旺  J/  2  M   4  RU 鼂  WG 量
+
+When the next key leads to several kanji (for instance "M" above) a
+total number of variants is shown.  When the key leads to a single
+kanji (like "G" above) that kanji is shown.  The kanji is also shown
+if the next key will produce an unique prefix for the code.  For
+instance if after "AM" you type "B" then it will lead to the only code
+"AMBI", so the whole suffix "BI" is shown.  "J/  2" above means that
+there's no more code letters below "AMJ", but there are two variants,
+"AMJ/1" and "AMJ/2".
+
+Finally, if you immediately press C<TAB> the second time the list of
+possible completions will be fully expanded:
+
+  /    旦  D/   旴  J/1  旰  MK   晸  O/   昃  SH   昜  YO   是
+  AM   晅  DI   㝵  J/2  旱  MP   曬  OB/1 昞  SL   昻
+  BI   曇  G    旺  K/   昊  MR   晤  OB/2 昺  WG   量
+  CW   晒  IG   晊  KS   昮  MV   晨  RU   鼂  YM   昰
+
+=item * You can use C<M-?> key after the (partial) code to see what it
+will be expanded to.  This works much like pressing C<TAB> twice,
+except that no expansion happens even when code (prefix) is unique.
+For instance as said above "AMB" is an unique prefix for "AMBI", so if
+you type in "AMB" and press C<TAB> the code will be replaced with 曇.
+If you press C<M-?> instead you will get
+
+  I 曇
+
+This is handy then you want to learn what the complete code would be.
+
+=item * You may insert all kanji matching partial code at once by
+pressing C<M-*>.  Note that a few kanji have more than one Cangjie
+code and thus may appear multiple times.
+
+=item * Or you may cycle through alternatives with C<C-x TAB>.
+Together with universal argument this provides the means to insert Nth
+alternative without typing code suffix.  For instance if after
+
+  geekjdict>> AA<TAB><TAB>
+
+you see
+
+  /1  昌  A/1 晶  AM  曡  BUU 覸  HM  暒  MJ  晘  PV  暍  YF  暻
+  /2  昍  A/2 晿  AV  曟  F   焸  MH  暘  PH  晹  TE  曝
+
+you may get to 晿 by pressing C<M-4 C-x TAB>.
+
+=item * Instead of providing code prefix you may use C<TAB> to
+complete on glob patterns.  For instance if you are having trouble
+with recognition of kanji subforms but are positive that the first
+form is "A" and the last is "G", you may type
+
+  geekjdict>> A*G<TAB>
+
+to see all possibilities.  Note that in glob mode the pattern is not
+treated as a prefix, so you have to add "*" at the end to make it
+such:
+
+  geekjdict>> ?P[AB]*
+
+will list all codes where second from is "P" and the third is either
+"A" or "B" (very handy with blurred manga scans ;)).  Likewise in glob
+mode Cangjie codes are listed in full, not just their next keys or
+suffixes.
+
+=item * As with kana input modes, don't forget about undo key C<C-_>
+if you mistyped Cangjie code.
+
+=item * Ever wondered what C<CapsLock> key is for?  Now you know that
+it's for escape to Cangjie input mode (that's why C<M-C> uses capital
+"C" BTW).
+
+=item * You probably will try it sooner or later, so try it now:
+
+  geekjdict>> *<TAB>
+
+:)
+
+=back
+
+=head2 Glob patterns
+
+As said above, dictionary queries, the C<h> command and Cangjie input
+method can take glob patterns.  A glob pattern (or glob for short) is
+a way of matching character sequences by providing a template.  In a
+glob each character other than "*", "?" and "[" matches itself.  Hence
+"test" is a valid glob pattern that matches word "test" (in GeekJDict
+matching is case-insensitive, thus "test" also matches "TEST", "Test",
+"tESt", etc.).
+
+"*" matches any sequence of (non-whitespace in GeekJDict) characters,
+including the empty sequence.  Thus "te*st" will match "test",
+"te55st", "te-*-st", etc.
+
+"?" matches any single (non-whitespace in GeekJDict) character.  Thus
+"?est" will match "test", "nest", "best", "+est", etc.
+
+"[" begins character set that is ended by "]".  In its simplest form a
+character set matches a single character from a set of characters
+between "[" and "]".  Thus "[bn]est" will match "best" or "nest" (in
+any case), but no other word.
+
+Character set may also include ranges: "[0-9]" will match single
+decimal digit, and "[o-s]" will match one of "o", "p", "q", "r", or
+"s".  In case you are wondering "[9-0]" will match only "9".
+
+When the first character after "[" is "^" the set is complementary.
+I.e. it matches any character I<other than> what would be matched if
+where was no "^".  Thus "[^0-9]" matches any character that is I<not>
+a decimal digit.  "^" in a position other that first is treated as
+ordinary set member.
+
+Since character set always matches exactly one character it cannot be
+empty.  Hence if "]" comes right after "[" or "[^" it is treated as a
+set member and not as a symbol that closes the set.  Thus "[]]" is a
+set with one character, and will match single "]".
+
+Likewise "-" range requires both limits to be present, and is treated
+as ordinary set member when comes right after opening "[" or "[^", or
+just before closing "]" (also in a glob like "[0-9-z]" the only range
+is "0-9" and the rest "-" and "z" stand for themselves; on the other
+hand "[0-9a-z]" has two ranges, "0-9" and "a-z").
+
+"*" and "?" are not special inside character set, so to match them
+literally you may use "[*]" and "[?]" respectively.
+
+Finally, when the character set is incomplete (closing "]" is missing)
+it will never match.
+
+=head1 OPTIONS
+
+=over
+
+=item C<-h, --help>
+
+Print this message and exit.
+
+=item C<--data-info>
+
+Print dictionary data info and exit.
+
+=item C<-d, --db=F<DB>>
+
+Path to dictionary SQLite database.  Default is F<~/.geekjdict.sqlite>.
+
+=back
+
+=head2 User interface options
+
+=over
+
+=item C<--large-references>
+
+Use normal-sized characters instead of superscripts for references.
+
+=item C<--colors='I<KEY1>=I<COLOR1>, I<KEY2>=I<COLOR2>, ...'>
+
+Use custom colors.  Argument should be a comma-separated list of
+C<I<KEY>=I<COLOR>> assignments, where each I<KEY> is one of:
+
+    separator       writing       reading       tag       text
+
+and each I<COLOR> is a name of ANSI color:
+
+    black   red   green   yellow   blue   magenta   cyan   white
+
+    bright_black   bright_red       bright_green   bright_yellow
+    bright_blue    bright_magenta   bright_cyan    bright_white
+
+    rgbNNN (each N is 0..5)     grey0..grey23     ansi0..ansi15
+
+or C<clear> (default text color).
+
+For instance C<--colors=writing=red,reading=yellow> will change
+writing and reading colors.
+
+=item C<--no-colors>
+
+Disable color output.
+
+=back
+
+=head2 Update options
+
+=over
+
+=item C<--update=TYPE>
+
+Update dictionary database with data from files given as arguments.
+You are advised to use C<--lang> option (described below) to limit
+dictionary contents to the languages you actually care about.
+Possible values for C<TYPE> and data file sources are given below:
+
+=over
+
+=item C<--update=kanji F<kanjidic2.xml.gz> F<Unihan.zip> F<cangjie5.txt>>
+
+Expects three file names.
+
+F<kanjidic2.xml.gz> file can be obtained from
+L<http://www.csse.monash.edu.au/~jwb/kanjidic2/> (direct link is
+L<http://www.csse.monash.edu.au/~jwb/kanjidic2/kanjidic2.xml.gz>).
+
+F<Unihan.zip> file can be obtained from
+L<http://www.unicode.org/charts/unihan.html> (direct link is
+L<http://www.unicode.org/Public/UCD/latest/ucd/Unihan.zip>).
+
+F<cangjie5.txt> file can be obtained from
+L<https://github.com/definite/ibus-table-chinese/tree/master/tables/cangjie>
+(direct link is L<https://raw.githubusercontent.com/definite/ibus-table-chinese/master/tables/cangjie/cangjie5.txt>).
+
+=item C<--update=writing F<kanjivg-VERSION.xml.gz>>
+
+Expects one file name.
+
+F<kanjivg-I<VERSION>.xml.gz> file (where I<VERSION> stands for some
+date) can be obtained from
+L<https://github.com/KanjiVG/kanjivg/releases/latest> (there's no
+direct link).
+
+=item C<--update=words F<JMdict.gz>>
+
+Expects one file name.
+
+F<JMdict.gz> file can be obtained from
+L<http://www.edrdg.org/jmdict/j_jmdict.html> (direct link is
+L<ftp://ftp.monash.edu.au/pub/nihongo/JMdict.gz>, or
+L<ftp://ftp.monash.edu.au/pub/nihongo/JMdict_e.gz> for only English
+translations).
+
+=back
+
+See L<LICENSE/DATA> section below for data licenses info.
+
+=item C<--lang=LNG>
+
+Three letter language code from the ISO 639-2 standard.  May be
+specified multiple times.  When not given all translations are
+included.
+
+Note that translations other than English are generally in poor
+condition or missing entirely, so you are advised to always use
+C<--lang=eng> in addition to other or perhaps as the only C<--lang>
+option.
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) 2016 Tomash Brechko.  All rights reserved.
+
+GeekJDict is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+GeekJDict is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GeekJDict.  If not, see <http://www.gnu.org/licenses/>.
+
+=head2 DATA
+
+GeekJDict source distribution doesn't contain any data files.  However
+GeekJDict is assumed to be used with the following data:
+
+L<F<JMDICT>|http://www.edrdg.org/jmdict/j_jmdict.html> and
+L<F<KANJIDIC2>|http://www.csse.monash.edu.au/~jwb/kanjidic2/>
+dictionary files are the property of the L<Electronic Dictionary
+Research and Development Group|http://www.edrdg.org>, and are used in
+conformance with the Group's
+L<licence|http://www.edrdg.org/edrdg/licence.html>.
+
+L<F<KanjiVG>|http://kanjivg.tagaini.net/index.html> data files are
+copyright © 2009-2015 Ulrich Apel and released under the Creative
+Commons Attribution-Share Alike 3.0
+L<license|http://creativecommons.org/licenses/by-sa/3.0/>.
+
+L<F<Unihan>|http://www.unicode.org/charts/unihan.html> data files are
+copyright © 1991-2016 Unicode, Inc. and distributed under the L<Terms
+of Use|http://www.unicode.org/copyright.html>.
+
+L<F<cangjie5.txt>|https://github.com/definite/ibus-table-chinese/tree/master/tables/cangjie>
+data file is freely redistributable without restriction.
+
+See F<license/> directory in GeekJDict source tree for further details.
+
+=cut
+
+use strict;
+use warnings FATAL => qw(all);
+use open qw(:std :utf8);
+
+use FindBin;
+use lib "$FindBin::RealBin/lib";
+
+use Getopt::Long qw(:config gnu_getopt);
+use Pod::Usage;
+
+my %option = (
+    db => "$ENV{HOME}/.geekjdict.sqlite",
+    "large-references" => 0,
+    colors => "",
+    "no-colors" => 0,
+);
+GetOptions(\%option, qw(help|h data-info db|d=s
+                        large-references colors=s no-colors
+                        update=s lang=s@))
+    or pod2usage(2);
+pod2usage(-verbose => 2, -exitval => 0) if exists $option{help};
+
+my $geekjdict;
+unless (exists $option{update}) {
+    pod2usage(-message => "Expected no arguments", -exitval => 2)
+        if @ARGV;
+
+    require GeekJDict::CLI;
+    $geekjdict = GeekJDict::CLI->new(\%option);
+} elsif ($option{update} eq "kanji") {
+    pod2usage(-message => "Expected three file names as arguments",
+              -exitval => 2)
+        if @ARGV != 3;
+
+    require GeekJDict::Update::Kanji;
+    $geekjdict = GeekJDict::Update::Kanji->new(\%option, @ARGV);
+} elsif ($option{update} eq "writing") {
+    pod2usage(-message => "Expected one file name as argument", -exitval => 2)
+        if @ARGV != 1;
+
+    require GeekJDict::Update::Writing;
+    $geekjdict = GeekJDict::Update::Writing->new(\%option, @ARGV);
+} elsif ($option{update} eq "words") {
+    pod2usage(-message => "Expected one file name as argument", -exitval => 2)
+        if @ARGV != 1;
+
+    require GeekJDict::Update::Words;
+    $geekjdict = GeekJDict::Update::Words->new(\%option, @ARGV);
+} else {
+    pod2usage(-message => "Unknown update type --update=$option{update}",
+              -exitval => 2);
+}
+$geekjdict->run;

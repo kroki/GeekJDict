@@ -1,0 +1,68 @@
+# Different kinds of references.
+升形
+
+# Many references.
+手かせ
+
+# Source language.
+ぺてん
+
+# Multiple source languages.
+メルヘンチック
+
+# Source language without actual word.
+て拳道
+
+# Loanword with implied English.
+アゲンストウインド
+
+# Abbreviation in wide characters only.
+snep
+
+# Lots of glosses.
+上げる
+為る
+掛ける
+
+# Cross-reference and antonym.
+〇
+
+# No kanji.
+あんな such
+
+# Various references.
+隙
+
+# Reference followed by priority.
+奥深い
+
+# re_nokanji flag.
+ちょっと
+
+# Writing wrapping.
+蛇に噛まれて朽ち縄に怖じる
+コンピューターグラフィックス
+
+# Gloss wrapping.
+応える
+
+# Nested color wrapping.
+いらっしゃる
+会う
+
+# Missing in my font.
+𤭯
+
+# Long phrase.
+pneumonoultramicroscopicsilicovolcanoconiosis
+とくていどくりつぎょうせいほうじんとうのろうどうかんけいにかんするほうりつ
+ニューモノウルトラマイクロスコーピックシリコヴォルケーノコニオシス
+
+# Multiple Cangjie codes.
+k 牖冖捏溍爫碑
+
+# Search for 晴 should find 晴 instead.
+晴
+
+# Meanings from both KanjiDic2 and Unihan.
+k 㡡
