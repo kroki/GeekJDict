@@ -64,7 +64,7 @@ in the browser and choose "Save as..."):
 * [cangjie5.txt] (https://raw.githubusercontent.com/definite/ibus-table-chinese/master/tables/cangjie/cangjie5.txt)
 * `kanjivg-VERSION.xml.gz` (`VERSION` stands for some date) from [here]
   (https://github.com/KanjiVG/kanjivg/releases/latest)
-* [JMdict.gz] (ftp://ftp.monash.edu.au/pub/nihongo/JMdict.gz)
+* JMdict.gz from ftp://ftp.monash.edu.au/pub/nihongo/JMdict.gz
 
 Then execute the following commands:
 
