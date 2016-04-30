@@ -385,8 +385,8 @@ you may get to 晿 by pressing C<M-4 C-x TAB>.
 
 =item * Instead of providing code prefix you may use C<TAB> to
 complete on glob patterns.  For instance if you are having trouble
-with recognition of kanji subforms but are positive that the first
-form is "A" and the last is "G", you may type
+with recognition of kanji subforms but positive that the first form is
+"A" and the last is "G", you may type
 
   geekjdict>> A*G<TAB>
 
@@ -394,7 +394,7 @@ to see all possibilities.  Note that in glob mode the pattern is not
 treated as a prefix, so you have to add "*" at the end to make it
 such:
 
-  geekjdict>> ?P[AB]*
+  geekjdict>> ?P[AB]*<TAB>
 
 will list all codes where second from is "P" and the third is either
 "A" or "B" (very handy with blurred manga scans ;)).  Likewise in glob
