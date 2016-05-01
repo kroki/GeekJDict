@@ -383,6 +383,11 @@ sub process {
 sub run {
     my $self = shift;
 
+    # Most of the time we are blocked either in readline or in less.
+    # For readline we have "q" command or C-d (EOF) key, and less will
+    # handle SIGINT itself, so we should ignore it.
+    local $SIG{INT} = "IGNORE";
+
     # Make warnings visible in less (die will kill us anyway).  We also
     # let the color leak because we don't know the context anyway.
     local $SIG{__WARN__} = sub { print color("red"), "WARNING: ", @_ };
@@ -426,8 +431,6 @@ sub with_less {
         $| = 1;  # Flush every write.
         # Bail out on SIGPIPE.
         local $SIG{PIPE} = sub { die \$sigpipe };
-        # less will process SIGINT but we should ignore it.
-        local $SIG{INT} = "IGNORE";
         &$code;
     };
     select(STDOUT);
