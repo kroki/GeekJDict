@@ -1134,7 +1134,7 @@ BEGIN {
 
     # Cangjie help is based on https://zh.wikibooks.org/wiki/%E5%80%89%E9%A0%A1%E8%BC%B8%E5%85%A5%E6%B3%95/%E5%80%89%E9%A0%A1%E5%AD%97%E6%AF%8D%E8%88%87%E8%BC%94%E5%8A%A9%E5%AD%97%E5%BD%A2#.E8.BC.94.E5.8A.A9.E5.AD.97.E5.BD.A2 .
     $cangjie_help = <<END;
-A 日曰 t巴                      M 一㇀厂⼯ t百石豕 bl光壯
+A 日曰 t巴眉                    M 一㇀厂⼯ t百石豕 bl光壯
 B 月冂冖爫爫 t炙                N 弓亅㇖㇇㇕⺈㇠㇈㇅⺄ o夕 b今 tr阝乃朵設
 C 金丷 t分 b只 r扒 o小 i四      O 人亻 t乞気 l丘邱 r豕乑飞兆 br尺夫
 D 木 b子 r寸也 t夬皮韋 i五      P 心忄匕七勹 b恭 a比l切世 r代民式曳 o勿
