@@ -307,7 +307,7 @@ and the code will be replaced with 愛.
 
 =item * Shorter Cangjie code may represent kanji on its own while also
 being a prefix for a longer Cangjie codes.  For instance "AM" is the
-code for 旦, while there's also codes "AMAM", "AMG" and other.  To
+code for 旦, while there's also codes "AMAM", "AMG" and others.  To
 break the tie type "/" at the code end.  For example
 
   geekjdict>> AM/<TAB>
@@ -360,7 +360,7 @@ will be expanded to.  This works much like pressing C<TAB> twice,
 except that no expansion happens even when code (prefix) is unique.
 For instance as said above "AMB" is an unique prefix for "AMBI", so if
 you type in "AMB" and press C<TAB> the code will be replaced with 曇.
-If you press C<M-?> instead you will get
+If you press C<M-?> instead you will get a hint
 
   I 曇
 
@@ -381,25 +381,25 @@ you see
   /1  昌  A/1 晶  AM  曡  BUU 覸  HM  暒  MJ  晘  PV  暍  YF  暻
   /2  昍  A/2 晿  AV  曟  F   焸  MH  暘  PH  晹  TE  曝
 
-you may get to 晿 by pressing C<M-4 C-x TAB>.
+you can get to 晿 by pressing C<M-4 C-x TAB>.
 
 =item * Instead of providing code prefix you may use C<TAB> to
-complete on glob patterns.  For instance if you are having trouble
-with recognition of kanji subforms but positive that the first form is
-"A" and the last is "G", you may type
+complete on glob patterns.  For instance when you have difficulties
+recognizing kanji subforms but positive that the first form is "A" and
+the last is "G", you may type
 
   geekjdict>> A*G<TAB>
 
-to see all possibilities.  Note that in glob mode the pattern is not
-treated as a prefix, so you have to add "*" at the end to make it
-such:
+to see all possible completions.  Note that in glob mode the pattern
+is not treated as a prefix, so you have to add "*" at the end to make
+it such:
 
   geekjdict>> ?P[AB]*<TAB>
 
-will list all codes where second from is "P" and the third is either
-"A" or "B" (very handy with blurred manga scans ;)).  Likewise in glob
-mode Cangjie codes are listed in full, not just their next keys or
-suffixes.
+will list all codes where second from is "P" and the third (but not
+necessarily last) form is either "A" or "B" (very handy with blurred
+manga scans ;)).  Likewise in glob mode Cangjie codes are listed in
+full, not just their next keys or suffixes.
 
 =item * As with kana input modes, don't forget about undo key C<C-_>
 if you mistyped Cangjie code.
@@ -433,7 +433,7 @@ including the empty sequence.  Thus "te*st" will match "test",
 "?" matches any single (non-whitespace in GeekJDict) character.  Thus
 "?est" will match "test", "nest", "best", "+est", etc.
 
-"[" begins character set that is ended by "]".  In its simplest form a
+"[" begins character set that is ended by "]".  In its simplest form
 character set matches a single character from a set of characters
 between "[" and "]".  Thus "[bn]est" will match "best" or "nest" (in
 any case), but no other word.
