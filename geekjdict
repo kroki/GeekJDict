@@ -254,6 +254,15 @@ If you now press C<M-9 0 M-G> you will get intended
 
 (here argument of 90 means "convert all the words").
 
+Additionally, "t" command and "t:" lookup filters perform conversion
+automatically.  E.g.
+
+  katakana>>> t ンースf<RET>
+  hiragana>>> * t:んーすf<RET>
+
+will work as intended.
+
+
 =head2 Kanji input
 
 If you read Japanese in digital form (i.e. on the Internet or in an
