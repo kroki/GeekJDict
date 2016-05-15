@@ -101,7 +101,9 @@ type
 
   geekjdict>> t n; adj-no
 
-to see what it all means.
+to see what it all means.  It's possible to use glob patterns as well:
+
+  geekjdict>> t n n-*
 
 =item C<k KANJI...>
 

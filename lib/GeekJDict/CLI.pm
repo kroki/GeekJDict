@@ -316,12 +316,6 @@ sub _load_meta {
         FROM word_meta
         ORDER BY id
     });
-
-    my %tags;
-    foreach my $m (@{$self->{meta}}) {
-        $tags{$m->[1]} = $m->[2] if $m->[0] =~ /^[a-z]/;
-    }
-    $self->{tags} = \%tags;
 }
 
 
@@ -331,6 +325,11 @@ sub _prepare_statements {
     my $dbh = $self->{dbh};
     $self->{select_tag_id} = $dbh->prepare(q{
         SELECT id
+        FROM word_meta
+        WHERE id > 0 AND ki NOT GLOB '@*' AND lower(ab) GLOB ?
+    });
+    $self->{select_tag} = $dbh->prepare(q{
+        SELECT ab, ds
         FROM word_meta
         WHERE id > 0 AND ki NOT GLOB '@*' AND lower(ab) GLOB ?
     });
@@ -452,26 +451,29 @@ sub print_tags {
     my $self = shift;
     my ($input) = @_;
 
-    $input = jconvert(0, $input);
-
-    my $tags = $self->{tags};
-    my @tags = split /[^a-zA-Z0-9-]+/, $input;
-    if (@tags) {
-        shift @tags if $tags[0] eq "";
+    my @globs = GeekJDict::Base::get_globs(jconvert(0, $input));
+    if (@globs) {
+        shift @globs if $globs[0] eq "";
     } else {
-        @tags = keys %$tags;
+        @globs = ("*");
     }
     my $format =
         color("tag") . $item . "%-11s" . color("text") . "%s" . color("reset");
-    foreach my $t (sort { fc($a) cmp fc($b) } @tags) {
-        my $d = (exists $tags->{$t}
-                 ? (defined $tags->{$t}
-                    ? $tags->{$t}
-                    : color("tag") . "--- (no description)" . color("reset"))
-                 : color("tag") . "??? (unknown tag)" . color("reset"));
-        my $line = sprintf($format, $t, $d);
-        print $self->wrap_line($line, 12), "\n";
+    my %seen;
+    my @lines;
+    foreach my $g (@globs) {
+        $self->process(tag => $g => sub {
+            my ($ab, $ds) = @_;
+
+            return if $seen{$ab}++;
+            my $d = (defined $ds
+                     ? $ds
+                     : color("tag") . "--- (no description)" . color("reset"));
+            my $line = sprintf($format, $ab, $d);
+            push @lines, $self->wrap_line($line, 12) . "\n";
+        });
     }
+    print sort { fc($a) cmp fc($b) } @lines;
 }
 
 
