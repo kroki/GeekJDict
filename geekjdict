@@ -65,6 +65,26 @@ doesn't end in hiragana, and there's also a word that starts with
 and there may also be non-matching words in the dictionary entry of
 course.
 
+Word lookups can also take tag filters that follow "t:" separator.  For
+example the following two queries
+
+  geekjdict>> *[^あ-ん]*い  t: adj-na  t: nf* spec* ichi*
+  geekjdict>> *い   t:uk    t: adj-na  t: nf* spec* ichi*
+
+will list all common な-adjectives that look like い-adjectives (i.e. either
+their writing ends in い, or they are usually written in kana alone and their
+reading ends in い).  All "t:" filters are ANDed, while tags within each "t:"
+are ORed (hence last query above will show entries that have a word ending
+in い, and there's "uk" tag, and there's "adj-na" tag, and there's at least
+one of nf01..48 or spec1/2 or ichi1/2 tags).
+
+Lookups with tag filter may take a bit more time to execute, especially when
+query yields lots of matches, like
+
+  geekjdict>> * t:n
+
+but such queries aren't used very often.
+
 You can also type one of the commands described below (command names
 are case-sensitive):
 

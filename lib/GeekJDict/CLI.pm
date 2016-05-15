@@ -329,6 +329,11 @@ sub _prepare_statements {
     my $self = shift;
 
     my $dbh = $self->{dbh};
+    $self->{select_tag_id} = $dbh->prepare(q{
+        SELECT id
+        FROM word_meta
+        WHERE id > 0 AND ki NOT GLOB '@*' AND lower(ab) GLOB ?
+    });
     $self->{select_word} = $dbh->prepare(q{
         SELECT it, tx, jr, mr
         FROM word
@@ -698,11 +703,14 @@ sub lookup_words {
     my $self = shift;
     my ($query) = @_;
 
+    my ($globs, @tags) = split /(?:^|\s+)t:\s*/, $query;
+    $globs = "" unless defined $globs;
+
     my $dbh = $self->{dbh};
 
     my @ids;
     my %glob;
-    @glob{ map { s/\*\*+/*/gr } GeekJDict::Base::get_globs($query) } = ();
+    @glob{ map { s/\*\*+/*/gr } GeekJDict::Base::get_globs($globs) } = ();
     if (exists $glob{"?*"} || exists $glob{"*?"} || exists $glob{"*?*"}) {
         delete $glob{"?*"};
         delete $glob{"*?"};
@@ -760,6 +768,67 @@ sub lookup_words {
         }
         %match = ();
         @ids = sort { $a <=> $b } @ids;
+    }
+
+    if (@ids && $query =~ /(?:^|\s+)t:/) {
+        my @condition;
+        foreach my $t (@tags) {
+            $t =~ s/\*\*+/*/g;
+            my @g = GeekJDict::Base::get_globs(jconvert(0, $t));
+            @g = grep { !/^\*$/ && !/^\?\*$/ && !/^\*\?$/ && !/^\*\?\*$/ } @g;
+            if (@g) {
+                my @c;
+                foreach my $g (@g) {
+                    $self->process(tag_id => $g => sub {
+                        push @c, "instr(mr, char($_[0]))";
+                    });
+                }
+                if (@c) {
+                    push @condition, join(" OR ", @c);
+                } else {
+                    @condition = ();
+                    last;
+                }
+            } else {
+                push @condition, undef;
+            }
+        }
+        if (@condition) {
+            @condition = grep { defined } @condition;
+            if (@condition) {
+                my @filtered;
+                if (@ids >= 200) {
+                    my $filter = $dbh->prepare(qq{
+                        SELECT id
+                        FROM (SELECT id, group_concat(mr, '') AS mr
+                              FROM word
+                              WHERE id IN (@{[ "?," x 199 . "?" ]})
+                              GROUP BY id)
+                        WHERE (@{[ join ") AND (", @condition ]})
+                    });
+                    do {
+                        my @i = splice @ids, 0, 200;
+                        my $f = $dbh->selectcol_arrayref($filter, undef, @i);
+                        push @filtered, @$f;
+                    } while (@ids >= 200);
+                }
+                if (@ids) {
+                    my $filter = $dbh->prepare(qq{
+                        SELECT id
+                        FROM (SELECT id, group_concat(mr, '') AS mr
+                              FROM word
+                              WHERE id IN (@{[ join ",", @ids ]})
+                              GROUP BY id)
+                        WHERE (@{[ join ") AND (", @condition ]})
+                    });
+                    my $f = $dbh->selectcol_arrayref($filter);
+                    push @filtered, @$f;
+                }
+                @ids = @filtered;
+            }
+        } else {
+            @ids = ();
+        }
     }
 
     my $count = @ids;
