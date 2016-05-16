@@ -76,7 +76,10 @@ their writing ends in い, or they are usually written in kana alone and their
 reading ends in い).  All "t:" filters are ANDed, while tags within each "t:"
 are ORed (hence last query above will show entries that have a word ending
 in い, and there's "uk" tag, and there's "adj-na" tag, and there's at least
-one of nf01..48 or spec1/2 or ichi1/2 tags).
+one of nf01..48 or spec1/2 or ichi1/2 tags).  And here is a query for common
+godan verbs that look like ichidan verbs (end in ぃる or ぇる):
+
+  geekjdict>> *[いきしちにひみりえけせてねへめれ]る t:v5r t:nf* spec* ichi*
 
 Lookups with tag filter may take a bit more time to execute, especially when
 query yields lots of matches, like
