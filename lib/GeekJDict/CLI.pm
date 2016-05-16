@@ -390,7 +390,7 @@ sub run {
     # Most of the time we are blocked either in readline or in less.
     # For readline we have "q" command or C-d (EOF) key, and less will
     # handle SIGINT itself, so we should ignore it.
-    local $SIG{INT} = "IGNORE";
+    local $SIG{INT} = "IGNORE" if exists $self->{less};
 
     # Make warnings visible in less (die will kill us anyway).  We also
     # let the color leak because we don't know the context anyway.
