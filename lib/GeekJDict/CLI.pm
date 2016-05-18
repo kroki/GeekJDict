@@ -403,7 +403,7 @@ sub run {
         exit if $input eq "q";
         @$self{qw(height width)} = $readline->get_screen_size;
         if ($input =~ s/^t(?:\s+|$)//) {
-            $self->with_less(sub { $self->print_tags($input) });
+            $self->with_less(sub { $self->show_tags($input) });
         } elsif ($input =~ s/^h(?:\s+|$)//) {
             $self->with_less(sub { $self->{readline}->print_history($input) });
         } elsif ($input =~ s/^k(?:\s+|$)//) {
@@ -449,7 +449,7 @@ sub with_less {
 }
 
 
-sub print_tags {
+sub show_tags {
     my $self = shift;
     my ($input) = @_;
 
