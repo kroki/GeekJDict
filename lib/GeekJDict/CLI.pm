@@ -27,6 +27,7 @@ use utf8;
 use open qw(:std :utf8);
 
 
+use GeekJDict::Util qw(get_globs);
 use GeekJDict::Romaji qw(jconvert);
 
 
@@ -451,7 +452,7 @@ sub print_tags {
     my $self = shift;
     my ($input) = @_;
 
-    my @globs = GeekJDict::Base::get_globs(jconvert(0, $input));
+    my @globs = get_globs(jconvert(0, $input));
     if (@globs) {
         shift @globs if $globs[0] eq "";
     } else {
@@ -712,7 +713,7 @@ sub lookup_words {
 
     my @ids;
     my %glob;
-    @glob{ map { s/\*\*+/*/gr } GeekJDict::Base::get_globs($globs) } = ();
+    @glob{ map { s/\*\*+/*/gr } get_globs($globs) } = ();
     if (exists $glob{"?*"} || exists $glob{"*?"} || exists $glob{"*?*"}) {
         delete $glob{"?*"};
         delete $glob{"*?"};
@@ -776,7 +777,7 @@ sub lookup_words {
         my @condition;
         foreach my $t (@tags) {
             $t =~ s/\*\*+/*/g;
-            my @g = GeekJDict::Base::get_globs(jconvert(0, $t));
+            my @g = get_globs(jconvert(0, $t));
             @g = grep { !/^\*$/ && !/^\?\*$/ && !/^\*\?$/ && !/^\*\?\*$/ } @g;
             if (@g) {
                 my @c;

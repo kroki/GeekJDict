@@ -24,6 +24,7 @@ use warnings qw(all);
 use utf8;
 
 use Term::ReadLine;
+use GeekJDict::Util qw(globs2regexps);
 use GeekJDict::Romaji qw(jconvert jconvert_last);
 
 
@@ -242,39 +243,7 @@ sub print_history {
     my $self = shift;
     my ($input) = @_;
 
-    my @globs = split /\s+/, $input;
-    foreach my $glob (@globs) {
-        my @glob;
-        my $cset = 0;
-        foreach my $g (split /([][?*^-])/, $glob) {
-            next if $g eq "";
-            if ($g eq "]") {
-                $cset = 0
-                    unless ($cset == @glob
-                            || ($cset == @glob - 1 && $glob[$cset] eq "^"));
-            } elsif ($g eq "[") {
-                unless ($cset) {
-                    $cset = @glob + 1;
-                    $g = "(?=\\S)[";
-                }
-            } elsif ($g eq "?") {
-                $g = "\\S" unless $cset;
-            } elsif ($g eq "*") {
-                $g = "\\S*" unless $cset;
-            } elsif ($g eq "^") {
-                $g = "\\^" unless $cset;
-            } elsif ($g ne "-") {
-                $g =~ s/([.+()|\$\\])/\\$1/g;
-            }
-            push @glob, $g;
-        }
-        unless ($cset) {
-            $glob = join "", @glob;
-            $glob = qr/(?:^|\s)$glob(?:\s|$)/i;
-        } else {
-            $glob = qr/(*FAIL)/;
-        }
-    }
+    my @regexps = map { qr/(?:^|\s)$_(?:\s|$)/i } globs2regexps($input);
 
     my $readline = $self->{readline};
     my $attribs = $readline->Attribs;
@@ -285,7 +254,7 @@ sub print_history {
         my $line = $readline->history_get(--$offset);
         utf8::decode($line);
         next if $line =~ /^h(?:\s|$)/;  # Hide "show history" commands.
-        next if grep { $line !~ $_ } @globs;
+        next if grep { $line !~ $_ } @regexps;
         print $line, "\n";
     }
 }

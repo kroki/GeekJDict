@@ -50,28 +50,4 @@ sub new {
 }
 
 
-sub _normalize {
-    use Unicode::Normalize;
-    # Fold case and remove diacritical marks.
-    $_[0] = NFKD fc $_[0];
-    $_[0] =~ s/\p{Block: Combining_Diacritical_Marks}//g;
-    $_[0] = NFC $_[0];
-
-    # Remove commas in numbers.
-    $_[0] =~ s/([0-9]),(?=[0-9])/$1/g;
-
-    return $_[0];
-}
-
-
-sub get_terms {
-    return _normalize($_[0]) =~ /((?:[^\W_・]|[○×◎〃※〒△→←↑↓])+)/g;
-}
-
-
-sub get_globs {
-    return _normalize($_[0]) =~ /((?:[^\W_・]|[○×◎〃※〒△→←↑↓]|[]^[?*-])+)/g;
-}
-
-
 1

@@ -25,6 +25,9 @@ use warnings qw(all);
 use utf8;
 
 
+use GeekJDict::Util qw(get_terms);
+
+
 sub new {
     my $class = shift;
     my ($option, $jmdict) = @_;
@@ -447,7 +450,7 @@ sub _create_index {
     $select->bind_columns(\my ($id, $tx));
     $select->execute;
     while ($select->fetch) {
-        my @terms = GeekJDict::Base::get_terms($tx);
+        my @terms = get_terms($tx);
         foreach my $t (@terms) {
             push @{$terms{$t}}, $id;
         }
