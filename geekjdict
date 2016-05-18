@@ -220,7 +220,7 @@ Use "'" to separate "ん" from the vowel.  For instance ("nan'a"):
              a  |  hiragana>>> なんあ
 
 Katakana (C<M-k>) mode works the same way.  In both hiragana and
-katakana modes "-" is converted to "ー".
+katakana modes "--" (double hyphen) is converted to "ー".
 
 If you mistyped some character (for instance you meant "shu" but
 typed "sho") you don't have to start over: use undo (C<C-_>, C<C>
@@ -260,8 +260,8 @@ If you now press C<M-9 0 M-G> you will get intended
 Additionally, "t" command and "t:" lookup filters perform conversion
 automatically.  E.g.
 
-  katakana>>> t ンースf<RET>
-  hiragana>>> * t:んーすf<RET>
+  katakana>>> t ン-スf<RET>
+  hiragana>>> * t:ん-すf<RET>
 
 will work as intended.
 

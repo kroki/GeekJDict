@@ -92,7 +92,7 @@ BEGIN {
         ぱ => "pa", ぴ =>  "pi", ぷ =>  "pu", ぺ => "pe", ぽ => "po",
 
         # Prolonged sound mark.
-        ー => "-"
+        ー => "--"
     );
     # Diphthongs.
     foreach my $mora (qw(き       に ひ み り ぎ       び ぴ)) {
