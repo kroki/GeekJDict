@@ -302,9 +302,11 @@ sub _init_readline {
     $cangjie_help =~ s/(\p{Han}+|\p{CJK_Strokes}+)/color("writing")
                                                    . $1 . color("reset")/eg;
 
+    my $kana_inhibitor = qr/(?:^\s*t\s|(?:^|\s)t:)/;
+
     use GeekJDict::ReadLine;
-    $self->{readline} = GeekJDict::ReadLine->new($complete, $display,
-                                                 $cangjie_help);
+    $self->{readline} = GeekJDict::ReadLine->new($kana_inhibitor, $complete,
+                                                 $display, $cangjie_help);
 }
 
 

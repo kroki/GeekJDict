@@ -30,7 +30,8 @@ use GeekJDict::Romaji qw(jconvert jconvert_last);
 
 sub new {
     my $class = shift;
-    my ($complete_kanji, $display_kanji_list, $cangjie_help) = @_;
+    my ($kana_inhibitor, $complete_kanji,
+        $display_kanji_list, $cangjie_help) = @_;
 
     my $readline = Term::ReadLine->new("GeekJDict", \*STDIN, \*STDOUT);
     $readline->ornaments(0);
@@ -131,10 +132,14 @@ sub new {
         } else {
             $get_line->();
 
-            substr($line, 0, -3, "");
-            $replacement = jconvert_last($map, $line . $char);
+            if ($line =~ $kana_inhibitor) {
+                $readline->insert_text($char x $count);
+            } else {
+                substr($line, 0, -3, "");
+                $replacement = jconvert_last($map, $line . $char);
 
-            $update_line->();
+                $update_line->();
+            }
         }
 
         return 0;
