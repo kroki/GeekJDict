@@ -36,7 +36,7 @@ as
 
   gnome-terminal --zoom=2 --command geekjdict
 
-=head2 Commands
+=head2 Lookups
 
 When GeekJDict shows input prompt you may type in the query to lookup.
 For instance
@@ -88,8 +88,11 @@ query yields lots of matches, like
 
 but such queries aren't used very often.
 
-You can also type one of the commands described below (command names
-are case-sensitive):
+
+=head2 Commands
+
+After the input prompt you can type one of the commands described
+below (command names are case-sensitive):
 
 =over
 
