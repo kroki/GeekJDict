@@ -28,7 +28,6 @@ use open qw(:std :utf8);
 
 
 use GeekJDict::Util qw(get_globs);
-use GeekJDict::Romaji qw(jconvert);
 
 
 # Following characters SHOULD be narrow and SHOULD NOT match \p{Ea=A}.
@@ -454,7 +453,7 @@ sub print_tags {
     my $self = shift;
     my ($input) = @_;
 
-    my @globs = get_globs(jconvert(0, $input));
+    my @globs = get_globs($input);
     if (@globs) {
         shift @globs if $globs[0] eq "";
     } else {
@@ -779,7 +778,7 @@ sub lookup_words {
         my @condition;
         foreach my $t (@tags) {
             $t =~ s/\*\*+/*/g;
-            my @g = get_globs(jconvert(0, $t));
+            my @g = get_globs($t);
             @g = grep { !/^\*$/ && !/^\?\*$/ && !/^\*\?$/ && !/^\*\?\*$/ } @g;
             if (@g) {
                 my @c;
