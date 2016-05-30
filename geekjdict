@@ -24,11 +24,11 @@ emulators in graphic desktop environments of modern OS distributions
 comply with these requirements out of the box.
 
 GeekJDict can provide dictionary information about Japanese words and
-expressions as well as individual kanji, and can show handwriting of
-selected characters.  GeekJDict implements powerful glob pattern
-lookup, direct hiragana and katakana input, and direct kanji input via
-built-in support for Cangjie input method with glob patterns and
-completion.
+expressions as well as individual kanji, show handwriting of selected
+characters, and trace inflected words to their dictionary form.
+GeekJDict implements powerful glob pattern lookup, direct hiragana and
+katakana input, and direct kanji input via built-in support for
+Cangjie input method with glob patterns and completion.
 
 It is advised to run GeekJDict in a separate terminal window with
 enlarged font (and black background).  For instance the author runs it
@@ -131,6 +131,22 @@ coarse but nevertheless is quite discernible.  For example type
   geekjdict>> w 語
 
 and press C<SPACE> key until the writing is complete.
+
+=item C<g WORD>
+
+Perform backward grammar inference on a C<WORD>.  I.e. given an
+inflected word figure out its dictionary form.  For instance:
+
+  geekjdict>> g たべとかなかった
+
+This command is experimental in a sense that individual rules may come
+and go, output format may change, etc.  You should also be aware that
+any set of simple inference rules can't capture all aspects of the
+complex language grammar, so this command may occasionally produce
+nonsensical results.  You may want to take a look at further comments
+on how inference process works and what grammar rules are available,
+see C<--grammar> option below to learn default location of the
+grammar file.  And you are always welcome to contribute new rules!
 
 =item C<h [GLOB...]>
 
@@ -510,6 +526,11 @@ Print dictionary data info and exit.
 
 Path to dictionary SQLite database.  Default is F<~/.geekjdict.sqlite>.
 
+=item C<-g, --grammar=F<GRAMMAR>>
+
+Path to grammar rules file.  Default is F<lib/GeekJDict/grammar.rules>
+in the distribution directory.
+
 =back
 
 =head2 User interface options
@@ -669,11 +690,12 @@ use Pod::Usage;
 
 my %option = (
     db => "$ENV{HOME}/.geekjdict.sqlite",
+    grammar => "$FindBin::RealBin/lib/GeekJDict/grammar.rules",
     "large-references" => 0,
     colors => "",
     "no-colors" => 0,
 );
-GetOptions(\%option, qw(help|h data-info db|d=s
+GetOptions(\%option, qw(help|h data-info db|d=s grammar|g=s
                         large-references colors=s no-colors
                         update=s lang=s@))
     or pod2usage(2);

@@ -68,6 +68,10 @@ sub new {
     $self->{less} = [qw(less --no-init --RAW-CONTROL-CHARS --ignore-case
                              --quit-if-one-screen)] if -t STDIN;
 
+    use GeekJDict::Grammar;
+    $self->{grammar} = GeekJDict::Grammar->new($option->{grammar},
+                                               $self->{dbh});
+
     $self->_init_readline;
     $self->_load_meta;
     $self->_prepare_statements;
@@ -411,6 +415,8 @@ sub run {
         } elsif ($input =~ s/^w(?:\s+|$)//) {
             $self->with_less(qw(--window=-1),
                              sub { $self->show_writing($input) });
+        } elsif ($input =~ s/^g(?:\s+|$)//) {
+            $self->with_less(sub { $self->show_grammar($input) });
         } else {
             $self->with_less(sub { $self->lookup_words($input) });
         }
@@ -700,6 +706,36 @@ sub polybezier {
         }
     }
     return @points, [$_[-2], $_[-1]];
+}
+
+
+sub show_grammar {
+    my $self = shift;
+    my ($query) = @_;
+
+    my $node = $self->{grammar}->infer_backward($query);
+    my $word = shift @$node;
+    print_node($word, $node, 1) if @$node;
+
+    sub print_node {
+        my ($word, $node, $depth) = @_;
+
+        my $indent = " " x $depth;
+        if (@{$node->[-1]} == 2) {
+            my $n = pop @$node;
+            $n->[0] .= " " if $n->[0];
+            print($indent, color("separator"), "see $n->[0]",
+                  color("reset"), "$word t: $n->[1]\n");
+        }
+        foreach my $n (@$node) {
+            my ($w, $f) = splice @$n, 0, 2;
+            $f .= " form" unless $f =~ /\bform\b/;
+            print($indent, color("writing"), $word,
+                  color("separator"), " is the $f of ", color("writing"), $w,
+                  color("reset"), "\n");
+            print_node($w, $n, $depth + 1);
+        }
+    }
 }
 
 

@@ -8,10 +8,11 @@ emulators in graphic desktop environments of modern OS distributions
 comply with these requirements out of the box.
 
 GeekJDict can provide dictionary information about Japanese words and
-expressions, individual kanji, and can show handwriting of selected
-characters.  GeekJDict implements powerful glob pattern lookup, direct
-hiragana and katakana input, as well as direct kanji input via
-built-in support of [Cangjie input method]
+expressions, individual kanji, show handwriting of selected
+characters, and trace inflected words to their dictionary form.
+GeekJDict implements powerful glob pattern lookup, direct hiragana and
+katakana input, as well as direct kanji input via built-in support of
+[Cangjie input method]
 (https://en.wikipedia.org/wiki/Cangjie_input_method) with glob
 patterns and completion.
 
@@ -80,7 +81,7 @@ get all available languages.
 
 To make the most out of GeekJDict features you are advised to read the
 output of `geekjdict --help`, especially sections on kana and kanji
-input and glob pattern queries.
+input, glob pattern queries and grammar inferences.
 
 
 # License

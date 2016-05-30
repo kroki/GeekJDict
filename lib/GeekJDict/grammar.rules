@@ -1,0 +1,516 @@
+# -*- encoding: utf-8 -*-
+#
+# Copyright (C) 2016 Tomash Brechko.  All rights reserved.
+#
+# This file is part of GeekJDict.
+#
+# GeekJDict is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# GeekJDict is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GeekJDict.  If not, see <http://www.gnu.org/licenses/>.
+#
+######################################################################
+#
+# This file contains grammar inference rules that are used by "g"
+# command.  If you change anything run 'make' to test the changes
+# (and do add tests for new rules).
+#
+# The format of the file is as follows: blank lines and comments (from
+# the first '#' character to the end of line) are ignored.  Inference
+# rule lines have the following format:
+#
+#   RULE [ROLE] PATTERN [POS] for TARGET PATTERN POS-GLOB...
+#
+# where individual tokens are separated by whitespaces.  RULE is a
+# rule name that is seen by the user in the output of "g" command.
+# Optional ROLE is the additional rule name used for reference by the
+# following rules.  Each PATTERN must begin with '〜' character
+# representing arbitrary (possibly empty) string, followed by suffix
+# consisting of kanji and hiragana.  Optional POS is one of JMdict's
+# part-of-speech tags (listed below).  TARGET is a reference to
+# previously defined RULE or ROLE name (there is also a predefined
+# role "plain").  Each POS-GLOB in a list is a glob pattern matching
+# one or several part-of-speech tags.  When POS is omitted the rule is
+# applicable for all parts-of-speech listed in the POS-GLOB list.
+#
+# Additionally both PATTERNs may have katakana vowel (one of アイウエオ)
+# immediately after '〜' character.  Such rules represent sound change
+# pattern in a godan verbs and are replaced by nine rules with
+# corresponding hiragana characters.  For instance
+#
+#   ...〜ア... for ...〜ウ...
+#
+# will be replaced by 9 rules
+#
+#   ...〜さ... for ...〜す...
+#   ...〜か... for ...〜く...
+#   ...〜が... for ...〜ぐ...
+#   ...〜ま... for ...〜む...
+#   ...〜ば... for ...〜ぶ...
+#   ...〜な... for ...〜ぬ...
+#   ...〜ら... for ...〜る...
+#   ...〜わ... for ...〜う...
+#   ...〜た... for ...〜つ...
+#
+# (note that ア sound is わ, not あ).
+#
+#
+# The semantics of the rules is best explained by example.  For
+# instance the past tense of ichidan verbs is constructed by changing
+# る ending to た, so we have the rule (rule number in brackets is for
+# the reference in this example):
+#
+#   [1] past 〜た for plain 〜る v1*
+#
+# Likewise the past tense of godan verbs that end in く is constructed
+# by replacing last く with いた:
+#
+#   [2] past 〜いた for plain 〜く v5k
+#
+# The て-form of verbs that have past tense ending in た is
+# constructed by changing た to て:
+#
+#   [3] て-form 〜て for past 〜た v[15]* vk vs-*
+#
+# The continuous form of a verb is constructed from its て-form by
+# adding verb いる, and the whole construct is conjugated as plain
+# ichidan v1 verb, so we have the rule
+#
+#   [4] continuous plain 〜いる v1 for て-form 〜 v[15]* vk vs-*
+#
+# Finally, in a colloquial speech い in a continuous form is often
+# dropped:
+#
+#   [5] colloquial plain 〜る for continuous 〜いる v1
+#
+# Note again that last rule also includes "plain" role because the
+# shortened form also conjugates as a plain ichidan verb.
+#
+#
+# Now suppose the user tries to lookup a word 書いてた, finds nothing,
+# and then executes
+#
+#   geekjdict>> g 書いてた
+#
+# Backward inference begins by assuming any part-of-speech is equally
+# likely (i.e. '*' part-of-speech glob is initially assumed) and that
+# any rule is applicable.  So the inference process starts with the
+# tuple
+#
+#   (書いてた, *, <any role>)
+#
+# Rule [1] applies because the word ends in 〜た and * matches v1*.
+# So the tuple becomes
+#
+#   (書いてる, v1*, plain)
+#
+# There are only two rules in our example set that have "plain" role
+# ([4] and [5]), however the word doesn't end in 〜いる, so the only
+# match is [5] (v1* matches v1).  Now the tuple becomes
+#
+#   (書いている, v1, continuous)
+#
+# This matches the only "continuous" rule [4] (both suffix and
+# part-of-speech also match), so now we have
+#
+#   (書いて, v[15]* vk vs-*, て-form)
+#
+# Note the change in part-of-speech: v1 POS in rule [4] essentially
+# says that after adding いる to the て-form the result becomes plain
+# v1 verb.  But since inference process works backwards we have to
+# reverse the change: after いる is stripped the original て-form may
+# have been derived from any verb type, not necessary ichidan v1.
+# Last tuple matches rule [3] and brings us to the tuple
+#
+#   (書いた, v[15]* vk vs-*, past)
+#
+# This matches both rule [1] and [2].  The inference process actually
+# continues through rule [1] and we have sequences
+#
+#   書いた >[1]> 書いる >[4]> 書 => not a て-form, dead-end
+#   書いた >[1]> 書いる >[5]> 書いいる >[4]> 書い => not a て-form, dead-end
+#
+# so it leads us nowhere.  But then rule [2] is applied, and we have
+#
+#   (書く, v5k, plain)
+#
+# and the query "書く t: v5k" finds the word in dictionary (it should
+# be noted that database query is performed at each step of the
+# inference process, but this is the first time in our example that
+# the word is actually found in the database).  So the user will see
+# the trace
+#
+#   geekjdict>> g 書いてた
+#    書いてた is the past form of 書いてる
+#     書いてる is the colloquial form of 書いている
+#      書いている is the continuous form of 書いて
+#       書いて is the て-form of 書いた
+#        書いた is the past form of 書く
+#         see plain 書く t: v5k
+#
+#
+# Below is a list of part-of-speech tags that may be used in rules
+# (produced with the shell command
+#
+#    $ sqlite3 ~/.geekjdict.sqlite "
+#        SELECT printf('%-10s %s', ab, ds)
+#        FROM word_meta
+#        WHERE ki = 'pos' AND ds NOT LIKE '% (archaic)'
+#        ORDER BY ab"
+#
+#  use "* t:<tag>" queries in GeekJDict to see examples of each):
+#
+# adj-f      noun or verb acting prenominally
+# adj-i      adjective (keiyoushi)
+# adj-ix     adjective (keiyoushi) - yoi/ii class
+# adj-na     adjectival nouns or quasi-adjectives (keiyodoshi)
+# adj-nari   archaic/formal form of na-adjective
+# adj-no     nouns which may take the genitive case particle `no'
+# adj-pn     pre-noun adjectival (rentaishi)
+# adj-t      `taru' adjective
+# adv        adverb (fukushi)
+# adv-to     adverb taking the `to' particle
+# aux        auxiliary
+# aux-adj    auxiliary adjective
+# aux-v      auxiliary verb
+# conj       conjunction
+# cop-da     copula
+# ctr        counter
+# exp        expressions (phrases, clauses, etc.)
+# int        interjection (kandoushi)
+# n          noun (common) (futsuumeishi)
+# n-adv      adverbial noun (fukushitekimeishi)
+# n-pr       proper noun
+# n-pref     noun, used as a prefix
+# n-suf      noun, used as a suffix
+# n-t        noun (temporal) (jisoumeishi)
+# num        numeric
+# pn         pronoun
+# pref       prefix
+# prt        particle
+# suf        suffix
+# unc        unclassified
+# v1         Ichidan verb
+# v1-s       Ichidan verb - kureru special class
+# v5aru      Godan verb - -aru special class
+# v5b        Godan verb with `bu' ending
+# v5g        Godan verb with `gu' ending
+# v5k        Godan verb with `ku' ending
+# v5k-s      Godan verb - Iku/Yuku special class
+# v5m        Godan verb with `mu' ending
+# v5n        Godan verb with `nu' ending
+# v5r        Godan verb with `ru' ending
+# v5r-i      Godan verb with `ru' ending (irregular verb)
+# v5s        Godan verb with `su' ending
+# v5t        Godan verb with `tsu' ending
+# v5u        Godan verb with `u' ending
+# v5u-s      Godan verb with `u' ending (special class)
+# vi         intransitive verb
+# vk         Kuru verb - special class
+# vn         irregular nu verb
+# vr         irregular ru verb, plain form ends with -ri
+# vs         noun or participle which takes the aux. verb suru
+# vs-c       su verb - precursor to the modern suru
+# vs-i       suru verb - irregular
+# vs-s       suru verb - special class
+# vt         transitive verb
+# vz         Ichidan verb - zuru verb (alternative form of -jiru verbs)
+#
+
+#### plain forms
+
+declarative 〜だ for plain 〜 n* pn adj-na*
+
+polite 〜です for plain 〜 n* pn adj-na* adj-i*
+
+formal 〜である for plain 〜 n* pn adj-na*
+
+polite 〜来ます for plain 〜来る vk
+polite 〜きます for plain 〜くる vk
+polite 〜ます for plain 〜る v1*
+polite 〜します for plain 〜する vs-[is]
+polite 〜イます for plain 〜ウ v5[^a]* vs-c
+polite 〜います for plain 〜る v5aru
+
+する-form plain 〜する vs-i for plain 〜 vs
+
+ずる-form 〜ずる vz for plain 〜じる v1
+
+たる-adjective 〜たる for plain 〜 adj-t
+
+と-adverb 〜と for plain 〜 adv-to
+
+
+#### negative forms
+
+negative 〜じゃない for plain 〜 n* pn adj-na*
+
+negative 〜くない for plain 〜い adj-i
+negative 〜よくない adj-i for plain 〜いい adj-ix
+
+negative 〜来ない for plain 〜来る vk
+negative 〜こない for plain 〜くる vk
+negative 〜ない for plain 〜る v1*
+negative 〜しない for plain 〜する vs-[is]
+negative 〜しない for plain 〜す vs-c
+negative 〜さない for plain 〜する vs-s
+negative 〜アない for plain 〜ウ v5[^r]* v5r vs-c
+negative 〜ない for plain 〜ある v5r-i
+
+negative 〜ではない for formal 〜である n* pn adj-na*
+colloquial negative 〜でない for negative 〜ではない n* pn adj-na*
+
+polite 〜です for negative 〜 *
+polite 〜ありません for negative 〜ない n* pn adj-na* adj-i
+
+negative 〜ません for polite 〜ます *
+
+
+#### past forms
+
+past 〜だった for plain 〜 n* pn adj-na*
+
+past 〜かった for plain 〜い adj-i
+past 〜よかった adj-i for plain 〜いい adj-ix
+
+past 〜来た for plain 〜来る vk
+past 〜きた for plain 〜くる vk
+past 〜た for plain 〜る v1*
+past 〜した for plain 〜する vs-[is]
+past 〜した for plain 〜す v5s vs-c
+past 〜いた for plain 〜く v5k
+past 〜った for plain 〜く v5k-s
+past 〜いだ for plain 〜ぐ v5g
+past 〜んだ for plain 〜む v5m
+past 〜んだ for plain 〜ぶ v5b
+past 〜んだ for plain 〜ぬ v5n
+past 〜った for plain 〜る v5r* v5aru
+past 〜った for plain 〜う v5u
+past 〜うた for plain 〜う v5u-s
+past 〜った for plain 〜つ v5t
+colloquial past 〜いらした for past 〜いらっしゃった v5aru
+colloquial past 〜居らした for past 〜居らっしゃった v5aru
+
+past 〜かった for negative 〜い *
+
+polite 〜でした for past 〜だった n* pn adj-na*
+polite 〜かったです for past 〜かった *
+
+polite 〜ありませんでした for past 〜なかった n* pn adj-na* adj-i
+
+past 〜ました for polite 〜ます *
+
+past 〜ませんでした for negative 〜ません *
+
+
+#### noun stem
+
+noun plain 〜 n for plain 〜る v1
+noun plain 〜イ n for plain 〜ウ v5[^a]*
+
+
+#### adverbs
+
+adverb plain 〜に adv for plain 〜 adj-na*
+adverb plain 〜く adv for plain 〜い adj-i
+adverb plain 〜よく adv for plain 〜いい adj-ix
+
+adverb plain 〜く adv for negative 〜い *
+
+
+#### to become with adverb
+
+to-become plain 〜なる v5r for plain 〜 adv
+
+
+#### potential form
+
+potential plain 〜来られる v1 for plain 〜来る vk
+potential plain 〜こられる v1 for plain 〜くる vk
+potential plain 〜られる v1 for plain 〜る v1*
+potential plain 〜出来る v1 for plain 〜する vs-i
+potential plain 〜できる v1 for plain 〜する vs-i
+potential plain 〜せられる v1 for plain 〜する vs-s
+potential plain 〜エる v1 for plain 〜ウ v5[^r]* v5r vs-c
+potential plain 〜り得る v1 for plain 〜る v5r-i v5aru
+potential       〜りうる v1 for plain 〜る v5r-i v5aru  # doesn't conjugate
+potential plain 〜りえる v1 for plain 〜る v5r-i v5aru
+
+colloquial plain 〜れる for potential 〜られる v1
+
+
+#### volitional form
+
+volitional 〜かろう for plain 〜い adj-i
+volitional 〜よかろう for plain 〜いい adj-ix
+
+volitional 〜かろう for negative 〜い *
+
+volitional 〜ましょう for polite 〜ます v[15]* vk vs-*
+
+volitional 〜来よう for plain 〜来る vk
+volitional 〜こよう for plain 〜くる vk
+volitional 〜よう for plain 〜る v1*
+volitional 〜しよう for plain 〜する vs-[is]
+volitional 〜そう for plain 〜する vs-s
+volitional 〜オう for plain 〜ウ v5* vs-c
+
+
+#### causative
+
+causative plain 〜来させる v1 for plain 〜来る vk
+causative plain 〜こさせる v1 for plain 〜くる vk
+causative plain 〜させる v1 for plain 〜る v1*
+causative plain 〜させる v1 for plain 〜する vs-[is]
+causative plain 〜アせる v1 for plain 〜ウ v5[^a]* vs-c
+
+colloquial plain 〜す v5s for causative 〜せる v1
+
+
+#### passive
+
+passive plain 〜来られる v1 for plain 〜来る vk
+passive plain 〜こられる v1 for plain 〜くる vk
+passive plain 〜られる v1 for plain 〜る v1*
+passive plain 〜される v1 for plain 〜する vs-[is]
+passive plain 〜アれる v1 for plain 〜ウ v5[^a]* vs-c
+
+
+#### imperative
+
+imperative 〜来い for plain 〜来る vk
+imperative 〜こい for plain 〜くる vk
+imperative 〜ろ for plain 〜る v1*
+imperative 〜よ for plain 〜る v1*
+imperative 〜れ for plain 〜れる v1-s
+imperative 〜しろ for plain 〜する vs-i
+imperative 〜せよ for plain 〜する vs-[is]
+imperative 〜エ for plain 〜ウ v5[^a]* vs-c
+imperative 〜い for plain 〜る v5aru
+
+imperative 〜ませ for polite 〜ます v[15]* vk vs-*
+
+
+#### ば-condition
+
+ば-condition 〜であれば for plain 〜 n* pn adj-na*
+
+ば-condition 〜ければ for plain 〜い adj-i*
+
+ば-condition negative-ば-condition 〜ければ for negative 〜い *
+colloquial negative-ば-condition 〜なけりゃ for negative-ば-condition 〜なければ *
+colloquial negative-ば-condition 〜なきゃ for negative-ば-condition 〜なけりゃ *
+
+ば-condition 〜えば for plain 〜する vs-s
+ば-condition 〜エば for plain 〜ウ v[15]* vk vs-[ci]
+
+
+#### たり-alternative
+
+たり-alternative plain 〜たり vs for past 〜た *
+たり-alternative plain 〜だり vs for past 〜だ *
+
+
+#### たらば-condition
+
+たら-condition 〜たら for past 〜た *
+たら-condition 〜だら for past 〜だ *
+
+formal 〜ば for たら-condition 〜 *
+
+
+#### て-form
+
+て-form 〜で for plain 〜 n* pn adj-na*
+て-form 〜くて for plain 〜い adj-i
+て-form 〜よくて adj-i for plain 〜いい adj-ix
+
+て-form 〜くて for negative 〜い *
+
+て-form 〜て for past 〜た v[15]* vk vs-*
+て-form 〜で for past 〜だ v[15]* vk vs-*
+
+
+#### continuous て-form
+
+continuous plain 〜いる v1 for て-form 〜 v[15]* vk vs-*
+colloquial plain 〜る for continuous 〜いる v1
+
+
+#### completed て-form
+
+completed plain 〜ある v1 for て-form 〜 v[15]* vk vs-*
+
+
+#### preparatory て-form
+
+preparatory plain 〜おく v5k for て-form 〜 v[15]* vk vs-*
+colloquial plain 〜とく for preparatory 〜ておく v5k
+
+
+#### directional て-form
+
+direction-away plain 〜行く v5k-s for て-form 〜 v[15]* vk vs-*
+direction-away plain 〜いく v5k-s for て-form 〜 v[15]* vk vs-*
+colloquial plain 〜く for direction-away 〜いく v5k-s
+
+direction-toward plain 〜来る vk for て-form 〜 v[15]* vk vs-*
+direction-toward plain 〜くる vk for て-form 〜 v[15]* vk vs-*
+
+
+#### desire
+
+desire plain 〜来たい adj-i for plain 〜来る vk
+desire plain 〜きたい adj-i for plain 〜くる vk
+desire plain 〜たい adj-i for plain 〜る v1*
+desire plain 〜したい adj-i for plain 〜する vs-[is]
+desire plain 〜イたい adj-i for plain 〜ウ v5* vs-c
+
+desire plain 〜欲しい adj-i for て-form 〜 v[15]* vk vs-*
+desire plain 〜ほしい adj-i for て-form 〜 v[15]* vk vs-*
+
+
+#### 〜てしまう and its colloquial forms
+
+finished plain 〜しまう v5u for て-form 〜 v[15]* vk vs-*
+colloquial plain 〜ちゃう for finished 〜てしまう *
+colloquial plain 〜ちまう for finished 〜てしまう *
+colloquial plain 〜じゃう for finished 〜でしまう *
+colloquial plain 〜じまう for finished 〜でしまう *
+
+
+#### "OK even if" expression
+
+even-if 〜も for て-form 〜 *
+OK-even-if 〜いい for even-if 〜 *
+colloquial 〜いい for OK-even-if 〜もいい *
+
+
+#### "must" and "must not” expressions
+
+て-form+は 〜は for て-form 〜 *
+colloquial て-form+は 〜じゃ for て-form+は 〜では *
+colloquial て-form+は 〜ちゃ for て-form+は 〜ては *
+
+must-not negative 〜いけない v1 for て-form+は 〜 *
+colloquial 〜なくちゃ for must-not 〜なくてはいけない v1
+
+must-not negative 〜といけない v1 for negative 〜 *
+colloquial 〜と for must-not 〜といけない v1
+
+must-not negative 〜いけない v1 for negative-ば-condition 〜 *
+colloquial 〜なきゃ for must-not 〜なければいけない v1
+
+formal negative 〜ならない v5r for must-not 〜いけない v1
+colloquial plain 〜だめ n for must-not 〜いけない v1
+
+polite negative 〜いけません for must-not 〜いけない v1
+polite negative 〜なりません for formal 〜ならない v5r
