@@ -1,0 +1,187 @@
+# BUG: invalid potential of potential.
+g 察せられる
+ 察せられる is the potential form of 察せる
+  察せる is the potential form of 察す
+   see plain 察す t: v5s
+ 察せられる is the potential form of 察する
+  see plain 察する t: vs-s
+ 察せられる is the passive form of 察せる
+  察せる is the potential form of 察す
+   see plain 察す t: v5s
+
+
+# BUG: invalid see polite つみます t: v5s
+# however there are only 4 such words, see *[しきぎみびにりいち]ます t:v*
+g つみません
+ つみません is the negative form of つみます
+  see polite つみます t: v5s
+  つみます is the polite form of つむ
+   see plain つむ t: v5m
+
+
+# BUG: noun form should be final.
+g く
+ see く t: ctr n n-suf num suf
+ く is the noun form of くる
+  くる is the colloquial form of くいる
+   see continuous くいる t: v1
+
+
+g # empty
+
+
+g あいませんでした
+ あいませんでした is the past form of あいません
+  あいません is the negative form of あいます
+   see polite あいます t: vs-c
+   あいます is the polite form of あう
+    see plain あう t: v5u
+
+
+g 問うて
+ 問うて is the て-form of 問うた
+  問うた is the past form of 問う
+   see plain 問う t: v5u-s
+
+
+g かわらなかった
+ かわらなかった is the past form of かわらない
+  see plain かわらない t: adj-i
+ かわらなかった is the past form of かわらない
+  かわらない is the negative form of かわる
+   see plain かわる t: v5r
+
+
+g まかない
+ see まかない t: n
+ まかない is the negative form of まく
+  see plain まく t: v5k
+ まかない is the noun form of まかなう
+  see plain まかなう t: v5u
+
+
+g 遊んで
+ 遊んで is the て-form of 遊んだ
+  遊んだ is the past form of 遊む
+   see plain 遊む t: v5m
+  遊んだ is the past form of 遊ぶ
+   see plain 遊ぶ t: v5b
+
+
+g 待ってませんでした
+ 待ってませんでした is the past form of 待ってません
+  待ってません is the negative form of 待ってます
+   待ってます is the polite form of 待ってる
+    待ってる is the colloquial form of 待っている
+     待っている is the continuous form of 待って
+      待って is the て-form of 待った
+       待った is the past form of 待つ
+        see plain 待つ t: v5t
+
+
+g 泊まってて
+ 泊まってて is the て-form of 泊まってた
+  泊まってた is the past form of 泊まってる
+   泊まってる is the colloquial form of 泊まっている
+    泊まっている is the continuous form of 泊まって
+     泊まって is the て-form of 泊まった
+      泊まった is the past form of 泊まる
+       see plain 泊まる t: v5r
+
+
+g 泊まってって
+ 泊まってって is the て-form of 泊まってった
+  泊まってった is the past form of 泊まってく
+   泊まってく is the colloquial form of 泊まっていく
+    泊まっていく is the direction-away form of 泊まって
+     泊まって is the て-form of 泊まった
+      泊まった is the past form of 泊まる
+       see plain 泊まる t: v5r
+
+
+g はやくさせる
+ はやくさせる is the causative form of はやくする
+  はやくする is the する-form of はやく
+   see plain はやく t: vs
+
+
+g うまくった
+ うまくった is the past form of うまくく
+  うまくく is the colloquial form of うまくいく
+   see direction-away うまくいく t: v5k-s
+
+
+g ちらかし
+ ちらかし is the noun form of ちらかす
+  see plain ちらかす t: v5s
+
+
+g 来ちゃった
+ 来ちゃった is the past form of 来ちゃう
+  来ちゃう is the colloquial form of 来てしまう
+   来てしまう is the finished form of 来て
+    来て is the て-form of 来た
+     来た is the past form of 来る
+      see plain 来る t: vk
+
+
+g たべなきゃ
+ たべなきゃ is the colloquial form of たべなけりゃ
+  たべなけりゃ is the colloquial form of たべなければ
+   たべなければ is the ば-condition form of たべない
+    たべない is the negative form of たべる
+     see plain たべる t: v1
+ たべなきゃ is the colloquial form of たべなければいけない
+  たべなければいけない is the must-not form of たべなければ
+   たべなければ is the ば-condition form of たべない
+    たべない is the negative form of たべる
+     see plain たべる t: v1
+
+
+g たべなければなりませんでした
+ たべなければなりませんでした is the past form of たべなければなりません
+  たべなければなりません is the polite form of たべなければならない
+   たべなければならない is the formal form of たべなければいけない
+    たべなければいけない is the must-not form of たべなければ
+     たべなければ is the ば-condition form of たべない
+      たべない is the negative form of たべる
+       see plain たべる t: v1
+
+
+g のんじゃだめ
+ のんじゃだめ is the colloquial form of のんじゃいけない
+  のんじゃいけない is the must-not form of のんじゃ
+   のんじゃ is the colloquial form of のんでは
+    のんでは is the て-form+は of のんで
+     のんで is the て-form of のんだ
+      のんだ is the past form of のむ
+       see plain のむ t: v5m
+
+
+g つよくなった
+ つよくなった is the past form of つよくなる
+  つよくなる is the to-become form of つよく
+   つよく is the adverb form of つよい
+    see plain つよい t: adj-i
+
+
+g 置いといて
+ 置いといて is the て-form of 置いといた
+  置いといた is the past form of 置いとく
+   置いとく is the colloquial form of 置いておく
+    置いておく is the preparatory form of 置いて
+     置いて is the て-form of 置いた
+      置いた is the past form of 置く
+       see plain 置く t: v5k
+
+
+g 枯れてっちゃう
+ 枯れてっちゃう is the colloquial form of 枯れてってしまう
+  枯れてってしまう is the finished form of 枯れてって
+   枯れてって is the て-form of 枯れてった
+    枯れてった is the past form of 枯れてく
+     枯れてく is the colloquial form of 枯れていく
+      枯れていく is the direction-away form of 枯れて
+       枯れて is the て-form of 枯れた
+        枯れた is the past form of 枯れる
+         see plain 枯れる t: v1
