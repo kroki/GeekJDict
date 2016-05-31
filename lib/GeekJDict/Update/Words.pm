@@ -346,6 +346,9 @@ sub _finalize {
 
     $self->_reorder;
     $self->_create_index;
+
+    $self->_limit_cangjie
+        if $self->{dbh}->tables(undef, undef, "cangjie", "TABLE");
 }
 
 

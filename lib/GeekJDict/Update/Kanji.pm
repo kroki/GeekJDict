@@ -137,10 +137,10 @@ sub _create_tables {
 
     # cangjie table:
     #  kc - kanji code point.
-    #  ti - type[6:5], index[4:0]:
-    #         0 0 - Cangjie code for basic form (A-W, Y)
-    #         1 i - Cangjie codes originally without 'X'
-    #         2 i - Cangjie codes with 'X' removed
+    #  ti - type[4:3], index[2:0]:
+    #         0 i - codes originally without 'X', basic form (A-W, Y) at 0 0
+    #         1 i - codes with 'X' removed
+    #       bit 4 is set if kanji is not used in any dictionary word
     #  tx - Cangjie code.
     $dbh->do(q{ DROP TABLE IF EXISTS cangjie });
     $dbh->do(q{
@@ -364,8 +364,8 @@ sub _populate {
             my ($tx, $kc) = split /\s+/;
             $tx = uc $tx;
             $kc = ord $kc;
-            $self->{cangjie_insert}->execute($kc, 0, $tx);
             $self->{kanji}->{$kc}->{cangjie}->{$tx} = undef;
+            $self->{cangjie_insert}->execute($kc, 0, $tx);
         }
         last if /^\s*BEGIN_TABLE\s*$/;
     }
@@ -384,8 +384,8 @@ sub _populate {
         my $cangjie = \$self->{kanji}->{$kc}->{cangjie};
         next if exists $$cangjie->{$tx};
 
-        $self->{cangjie_insert}->execute($kc, 32 | keys %$$cangjie, $tx);
         $$cangjie->{$tx} = undef;
+        $self->{cangjie_insert}->execute($kc, scalar(keys %$$cangjie), $tx);
     }
 
     while (my $line = $self->{unihan_codes}->getline) {
@@ -400,7 +400,7 @@ sub _populate {
             # cangjie5.txt or contains 'X' and "matches" some non-X
             # code for the same kanji (e.g. XABXC "matches" ABCDE).
             # In the latter case all 'X' are removed from the code.
-            my $type = 32;
+            my $type = 0;
             my $cangjie = \$self->{kanji}->{$kc}->{cangjie};
             if ($tx !~ /X/) {
                 next if exists $$cangjie->{$tx};
@@ -408,11 +408,11 @@ sub _populate {
                 my $re = $tx =~ s/X/.*/gr;
                 $re = qr/^$re/;
                 next if grep { $_ =~ $re } keys %$$cangjie;
-                $type = 64;
+                $type = 8;
                 $tx =~ s/X//g;
             }
-            $self->{cangjie_insert}->execute($kc, $type | keys %$$cangjie, $tx);
             $$cangjie->{$tx} = undef;
+            $self->{cangjie_insert}->execute($kc, $type | keys %$$cangjie, $tx);
         } elsif ($fi eq "kTotalStrokes"
                  && !exists $self->{kanji}->{$kc}->{radical}) {
             $tx =~ s/\s.*//;  # Use only first value.
@@ -439,8 +439,8 @@ sub _populate {
         $re = qr/^$re/;
         next if grep { $_ =~ $re } keys %$$cangjie;
         $tx =~ s/X//g;
-        $self->{cangjie_insert}->execute($kc, 64 | keys %$$cangjie, $tx);
         $$cangjie->{$tx} = undef;
+        $self->{cangjie_insert}->execute($kc, 8 | keys %$$cangjie, $tx);
     }
 
     while (my $line = $self->{unihan_radical}->getline) {
@@ -517,6 +517,9 @@ sub _finalize {
         WHERE k.kc <> c.kc AND unicode(NFKC(char(k.kc))) = c.kc
             AND NOT EXISTS (SELECT * FROM cangjie WHERE kc = k.kc)
     });
+
+    $self->_limit_cangjie
+        if $dbh->tables(undef, undef, "word", "TABLE");
 }
 
 

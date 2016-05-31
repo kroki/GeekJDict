@@ -518,6 +518,18 @@ it will never match.
 
 Print this message and exit.
 
+=item C<--limit-cangjie>
+
+By default Cangjie code completion shows all available codes.  When
+C<--limit-cangjie> is given Cangjie code completion will display code
+variants for only those kanji that are actually used in dictionary
+words.  This will reduce the number of codes shown by a factor of
+~2.5, which is helpful when you end up eye-scanning code lists.  It
+will still be possible to input other kanji by providing their full
+Cangjie code with variant number.
+
+Use C<--no-limit-cangjie> to override any previous C<--limit-cangjie>.
+
 =item C<--data-info>
 
 Print dictionary data info and exit.
@@ -695,7 +707,7 @@ my %option = (
     colors => "",
     "no-colors" => 0,
 );
-GetOptions(\%option, qw(help|h data-info db|d=s grammar|g=s
+GetOptions(\%option, qw(help|h data-info db|d=s grammar|g=s limit-cangjie!
                         large-references colors=s no-colors
                         update=s lang=s@))
     or pod2usage(2);

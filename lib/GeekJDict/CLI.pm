@@ -47,6 +47,22 @@ sub new {
         exit;
     }
 
+    ######## TODO: This code chunk should eventually be removed ########
+    {
+        my $old = $self->{dbh}->selectrow_array(q{
+            SELECT ti
+            FROM cangjie
+            WHERE ti >= 32
+            LIMIT 1
+        });
+        die("Please redo --update=kanji to bring dictionary database",
+            " to new format\n")
+            if $old;
+    }
+    ####################################################################
+
+    $self->{"limit-cangjie"} = $option->{"limit-cangjie"};
+
     $self->{"no-colors"} = $option->{"no-colors"};
     $ENV{ANSI_COLORS_DISABLED} = $option->{"no-colors"};
     $ENV{ANSI_COLORS_ALIASES} = $option->{colors};
@@ -129,6 +145,8 @@ sub _init_readline {
 
     my $dbh = $self->{dbh};
 
+    my $limit_cangjie = $self->{"limit-cangjie"} ? "AND ti < 16" : "";
+
     use DBD::SQLite;
     $dbh->sqlite_create_aggregate(
         "common_prefix", 1, "GeekJDict::CLI::CommonPrefix",
@@ -141,34 +159,34 @@ sub _init_readline {
         LIMIT 1
         OFFSET ?
     });
-    my $kanji_each = $dbh->prepare(q{
+    my $kanji_each = $dbh->prepare(qq{
         SELECT ?||char(kc)
         FROM cangjie
-        WHERE tx GLOB ?
+        WHERE tx GLOB ? $limit_cangjie
         ORDER BY tx, ti, kc
     });
     # We need nested query to impose ORDER BY on group_concat().
-    my $kanji_all = $dbh->prepare(q{
+    my $kanji_all = $dbh->prepare(qq{
         SELECT ?||group_concat(char(kc), '')
         FROM (SELECT kc, tx
               FROM cangjie
-              WHERE tx GLOB ?
+              WHERE tx GLOB ? $limit_cangjie
               ORDER BY tx, ti, kc)
         GROUP BY substr(tx, 1, ?)
     });
-    my $kanji_expand = $dbh->prepare(q{
+    my $kanji_expand = $dbh->prepare(qq{
         SELECT ?||tx||' '||char(kc)
         FROM cangjie
-        WHERE tx GLOB ?
+        WHERE tx GLOB ? $limit_cangjie
         ORDER BY tx, ti, kc
     });
-    my $kanji_next = $dbh->prepare(q{
+    my $kanji_next = $dbh->prepare(qq{
         SELECT ?||(CASE WHEN tx = ? THEN tx||'/ '||group_concat(char(kc), '')
                         WHEN count(*) = 1 THEN tx||' '||char(kc)
                         ELSE common_prefix(tx||'/')||' '||count(*) END)
         FROM (SELECT kc, tx AS tx
               FROM cangjie
-              WHERE tx GLOB ?
+              WHERE tx GLOB ? $limit_cangjie
               ORDER BY tx, ti, kc)
         GROUP BY substr(tx, 1, ?)
     });
@@ -510,7 +528,7 @@ sub lookup_kanji {
         $self->process(cangjie => $kc => sub {
             my ($ti, $tx) = @_;
 
-            push @{$k[9][$ti >> 6]}, $tx;
+            push @{$k[9][($ti >> 3) & 1]}, $tx;
         });
         $self->print_kanji($k, \@k, ++$index, $count);
     }

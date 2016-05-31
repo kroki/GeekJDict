@@ -91,4 +91,35 @@ sub _finalize {
 }
 
 
+sub _limit_cangjie {
+    my $self = shift;
+
+    my $dbh = $self->{dbh};
+
+    my $select_words = $dbh->prepare(q{
+        SELECT tx
+        FROM word
+        WHERE it & 7 = 0
+    });
+    $select_words->execute;
+    $select_words->bind_col(1, \my $word);
+    my %kanji;
+    @kanji{ $word =~ /(\p{Han})/g } = () while $select_words->fetch;
+
+    $dbh->do(q{
+        UPDATE cangjie
+        SET ti = ti | 16
+        WHERE ti > 0
+    });
+    my $update_cangjie = $dbh->prepare(q{
+        UPDATE cangjie
+        SET ti = ti & ~16
+        WHERE kc = ?
+    });
+    foreach my $kc (sort { $a <=> $b } map { ord } keys %kanji) {
+        $update_cangjie->execute($kc);
+    }
+}
+
+
 1
