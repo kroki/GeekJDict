@@ -824,7 +824,6 @@ sub lookup_words {
         while (my ($id, $m) = each %match) {
             push @ids, $id if $m == $match;
         }
-        %match = ();
         @ids = sort { $a <=> $b } @ids;
     }
 
