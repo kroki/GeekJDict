@@ -405,11 +405,12 @@ imperative 〜ませ for polite 〜ます v[15]* vk vs-*
 
 ば-condition 〜ければ for plain 〜い adj-i*
 
-ば-condition negative-ば-condition 〜ければ for negative 〜い *
-colloquial negative-ば-condition 〜なけりゃ for negative-ば-condition 〜なければ *
-colloquial negative-ば-condition 〜なきゃ for negative-ば-condition 〜なけりゃ *
+ば-condition 〜なければ for negative 〜ない *
+colloquial ば-condition 〜なきゃ for ば-condition 〜なけりゃ *
 
 ば-condition 〜エば for plain 〜ウ v[15]* vk vs-*
+
+colloquial ば-condition 〜りゃ for ば-condition 〜れば *
 
 
 #### たり-alternative
@@ -505,7 +506,7 @@ colloquial 〜なくちゃ for must-not 〜なくてはいけない v1
 must-not negative 〜といけない v1 for negative 〜 *
 colloquial 〜と for must-not 〜といけない v1
 
-must-not negative 〜いけない v1 for negative-ば-condition 〜 *
+must-not negative 〜いけない v1 for ば-condition 〜 *
 colloquial 〜なきゃ for must-not 〜なければいけない v1
 
 formal negative 〜ならない v5r for must-not 〜いけない v1
