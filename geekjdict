@@ -351,82 +351,65 @@ you encounter.
 and the code will be replaced with 愛.
 
 =item * Shorter Cangjie code may represent kanji on its own while also
-being a prefix for a longer Cangjie codes.  For instance "AM" is the
-code for 旦, while there's also codes "AMAM", "AMG" and others.  To
+being a prefix for a longer Cangjie codes.  For instance "AB" is the
+code for 明, while there're also codes "ABAC", "ABBE" and other.  To
 break the tie type "/" at the code end.  For example
 
-  geekjdict>> AM/<TAB>
+  geekjdict>> AB/<TAB>
 
-will produce 旦.
+will produce 明.
 
 =item * A few Cangjie codes represent several kanji.  To break the tie
 append a variant number to the code ("/" may be used for readability).
 For instance
 
-  geekjdict>> K2<TAB>
+  geekjdict>> WD2<TAB>
 
 or
 
-  geekjdict>> K/2<TAB>
+  geekjdict>> WD/2<TAB>
 
-will yield 乂.  You could also use "AM/1" or "AM1" above even if
-there's only one kanji for "AM" code.
+will yield 果.  You could also use "AB/1" or "AB1" above even if
+there's only one kanji for "AB/" code.
 
 =item * As you probably guessed already C<TAB> is a completion key.
 You may type in partial Cangjie code, press C<TAB> and see what next
 key you may use.  For instance when you type
 
-  geekjdict>> AM<TAB>
+  geekjdict>> AB<TAB>
 
 you will get possible variants for the next key:
 
-  /  旦  BI 曇  D   2  IG 晊  K   2  O   3  S   2  Y   2
-  AM 晅  CW 晒  G  旺  J/  2  M   4  RU 鼂  WG 量
+  /  明  AC 暝  B   2  JJ/ 2  ME 暖  U  冒
 
-When the next key leads to several kanji (for instance "M" above) a
+When the next key leads to several kanji (for instance "B" above) a
 total number of variants is shown.  When the key leads to a single
-kanji (like "G" above) that kanji is shown.  The kanji is also shown
+kanji (like "U" above) that kanji is shown.  The kanji is also shown
 if the next key will produce an unique prefix for the code.  For
-instance if after "AM" you type "B" then it will lead to the only code
-"AMBI", so the whole suffix "BI" is shown.  "J/  2" above means that
-there's no more code letters below "AMJ", but there are two variants,
-"AMJ/1" and "AMJ/2".
+instance if after "AB" you type "A" then it will lead to the only code
+"ABAC", so the whole suffix "AC" is shown.  "JJ/  2" above means that
+there's no more code letters below "ABJJ", but there are two variants,
+"ABJJ/1" and "ABJJ/2".
 
 Finally, if you immediately press C<TAB> the second time the list of
 possible completions will be fully expanded:
 
-  /    旦  D/   旴  J/1  旰  MK   晸  O/   昃  SH   昜  YO   是
-  AM   晅  DI   㝵  J/2  旱  MP   曬  OB/1 昞  SL   昻
-  BI   曇  G    旺  K/   昊  MR   晤  OB/2 昺  WG   量
-  CW   晒  IG   晊  KS   昮  MV   晨  RU   鼂  YM   昰
+  /    明  AC   暝  BE   曖  BT   盟  JJ/1 暈  JJ/2 暉  ME   暖  U    冒
 
 =item * You can use C<M-?> key after the (partial) code to see what it
 will be expanded to.  This works much like pressing C<TAB> twice,
 except that no expansion happens even when code (prefix) is unique.
-For instance as said above "AMB" is an unique prefix for "AMBI", so if
-you type in "AMB" and press C<TAB> the code will be replaced with 曇.
+For instance as said above "ABA" is an unique prefix for "ABAC", so if
+you type in "ABA" and press C<TAB> the code will be replaced with 暝.
 If you press C<M-?> instead you will get a hint
 
-  I 曇
+  C 暝
 
 This is handy then you want to learn what the complete code would be.
 
 =item * You may insert all kanji matching partial code at once by
 pressing C<M-*>.  Note that a few kanji have more than one Cangjie
 code and thus may appear multiple times.
-
-=item * Or you may cycle through alternatives with C<C-x TAB>.
-Together with universal argument this provides the means to insert Nth
-alternative without typing code suffix.  For instance if after
-
-  geekjdict>> AA<TAB><TAB>
-
-you see
-
-  /1  昌  A/1 晶  AM  曡  BUU 覸  HM  暒  MJ  晘  PV  暍  YF  暻
-  /2  昍  A/2 晿  AV  曟  F   焸  MH  暘  PH  晹  TE  曝
-
-you can get to 晿 by pressing C<M-4 C-x TAB>.
 
 =item * Instead of providing code prefix you may use C<TAB> to
 complete on glob patterns.  For instance when you have difficulties
@@ -446,6 +429,45 @@ necessarily last) form is either "A" or "B" (very handy with blurred
 manga scans ;)).  Likewise in glob mode Cangjie codes are listed in
 full, not just their next keys or suffixes.
 
+=item * You may cycle through alternatives with C<C-x TAB>.
+Together with universal argument this provides the means to insert Nth
+alternative without typing code (prefix).  For instance if after
+
+  geekjdict>> ?P[AB]*<TAB>
+
+you see
+
+  BPA     脂  GPBC    塡  JPA     耆  LPB     背  OPBUC/2 貸  YPBU    眥
+  DPBC    槇  HPA/1   昏  JPBN    寧  MPBUC   貮  PPAD    惸
+  EPA     洵  HPA/2   筍  KPBLB   帶  OPBUC/1 貨  QPA     指
+
+you can get to 洵 by pressing C<M-3 C-x TAB>.
+
+=item * Cangjie code completion is context aware.  In examples above we
+entered Cangjie codes in a context of word lookup, so possible code
+completions were limited to only those kanji that are actually used in
+dictionary words.  On the other hand in the context of "k", "h" (and
+for technical reasons "w") commands you get all possible kanji.  For
+instance
+
+  geekjdict>> A<TAB>
+
+will show
+
+  /1   日  B     8  F     2  I     3  M     9  P     2  S     4  V     2
+  /2   曰  CMBC 顕  G     2  J     5  N    44  QMB  晴  T     2  WL    2
+  A     3  DHL  晰  H     9  LBK  映  O     4  R     3  U    巴  Y     3
+
+while
+
+  geekjdict>> k A<TAB>
+
+will produce
+
+  /1 日  B  18  F   6  I  12  L   7  O  12  R   6  U  11  Y  19
+  /2 曰  C   3  G   5  J  10  M  25  P   8  S   6  V   7
+  A  15  D   5  H  25  K   5  N  95  Q   4  T  13  WL  3
+
 =item * As with kana input modes, don't forget about undo key C<C-_>
 if you mistyped Cangjie code.
 
@@ -455,7 +477,7 @@ it's for escape to Cangjie input mode (that's why C<M-C> uses capital
 
 =item * You probably will try it sooner or later, so try it now:
 
-  geekjdict>> *<TAB>
+  geekjdict>> k *<TAB>
 
 :)
 
@@ -517,18 +539,6 @@ it will never match.
 =item C<-h, --help>
 
 Print this message and exit.
-
-=item C<--limit-cangjie>
-
-By default Cangjie code completion shows all available codes.  When
-C<--limit-cangjie> is given Cangjie code completion will display code
-variants for only those kanji that are actually used in dictionary
-words.  This will reduce the number of codes shown by a factor of
-~2.5, which is helpful when you end up eye-scanning code lists.  It
-will still be possible to input other kanji by providing their full
-Cangjie code with variant number.
-
-Use C<--no-limit-cangjie> to override any previous C<--limit-cangjie>.
 
 =item C<--data-info>
 
@@ -707,7 +717,7 @@ my %option = (
     colors => "",
     "no-colors" => 0,
 );
-GetOptions(\%option, qw(help|h data-info db|d=s grammar|g=s limit-cangjie!
+GetOptions(\%option, qw(help|h data-info db|d=s grammar|g=s
                         large-references colors=s no-colors
                         update=s lang=s@))
     or pod2usage(2);

@@ -30,8 +30,8 @@ use GeekJDict::Romaji qw(jconvert jconvert_last);
 
 sub new {
     my $class = shift;
-    my ($kana_inhibitor, $complete_kanji,
-        $display_kanji_list, $cangjie_help) = @_;
+    my ($kana_inhibitor, $full_cangjie,
+        $complete_kanji, $display_kanji_list, $cangjie_help) = @_;
 
     my $readline = Term::ReadLine->new("GeekJDict", \*STDIN, \*STDOUT);
     $readline->ornaments(0);
@@ -150,7 +150,7 @@ sub new {
     }
 
     # Kanji input completion.
-    my $completions;
+    my ($limit_cangjie, $completions);
     # Do not ask for conformation if too many possible completions.
     $attribs->{completion_query_items} = -1;
     # Completions are already sorted...
@@ -160,14 +160,19 @@ sub new {
     # Enforce show-all-if-unmodified regardless of user settings.
     $readline->variable_bind("show-all-if-ambiguous", "off");
     $readline->variable_bind("show-all-if-unmodified", "on");
-    # Kanji completion function.
+    # Kanji completion and display functions.
+    $attribs->{attempted_completion_function} = sub {
+        # We don't need UTF-8 here, so no utf8::decode().
+        $limit_cangjie = substr($_[1], 0, $_[2]) !~ $full_cangjie;
+        return undef;
+    };
     $attribs->{completion_entry_function} = sub {
         my ($text, $index) = @_;
 
         unless ($index) {
             utf8::decode($text);
             my $type = chr $attribs->{completion_type};
-            $completions = $complete_kanji->($type, $text);
+            $completions = $complete_kanji->($type, $text, $limit_cangjie);
         }
 
         if ($index < @$completions) {

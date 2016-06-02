@@ -61,8 +61,6 @@ sub new {
     }
     ####################################################################
 
-    $self->{"limit-cangjie"} = $option->{"limit-cangjie"};
-
     $self->{"no-colors"} = $option->{"no-colors"};
     $ENV{ANSI_COLORS_DISABLED} = $option->{"no-colors"};
     $ENV{ANSI_COLORS_ALIASES} = $option->{colors};
@@ -145,8 +143,6 @@ sub _init_readline {
 
     my $dbh = $self->{dbh};
 
-    my $limit_cangjie = $self->{"limit-cangjie"} ? "AND ti < 16" : "";
-
     use DBD::SQLite;
     $dbh->sqlite_create_aggregate(
         "common_prefix", 1, "GeekJDict::CLI::CommonPrefix",
@@ -159,41 +155,41 @@ sub _init_readline {
         LIMIT 1
         OFFSET ?
     });
-    my $kanji_each = $dbh->prepare(qq{
+    my $kanji_each = $dbh->prepare(q{
         SELECT ?||char(kc)
         FROM cangjie
-        WHERE tx GLOB ? $limit_cangjie
+        WHERE tx GLOB ? AND ti < ?
         ORDER BY tx, ti, kc
     });
     # We need nested query to impose ORDER BY on group_concat().
-    my $kanji_all = $dbh->prepare(qq{
+    my $kanji_all = $dbh->prepare(q{
         SELECT ?||group_concat(char(kc), '')
         FROM (SELECT kc, tx
               FROM cangjie
-              WHERE tx GLOB ? $limit_cangjie
+              WHERE tx GLOB ? AND ti < ?
               ORDER BY tx, ti, kc)
         GROUP BY substr(tx, 1, ?)
     });
-    my $kanji_expand = $dbh->prepare(qq{
+    my $kanji_expand = $dbh->prepare(q{
         SELECT ?||tx||' '||char(kc)
         FROM cangjie
-        WHERE tx GLOB ? $limit_cangjie
+        WHERE tx GLOB ? AND ti < ?
         ORDER BY tx, ti, kc
     });
-    my $kanji_next = $dbh->prepare(qq{
+    my $kanji_next = $dbh->prepare(q{
         SELECT ?||(CASE WHEN tx = ? THEN tx||'/ '||group_concat(char(kc), '')
                         WHEN count(*) = 1 THEN tx||' '||char(kc)
                         ELSE common_prefix(tx||'/')||' '||count(*) END)
         FROM (SELECT kc, tx AS tx
               FROM cangjie
-              WHERE tx GLOB ? $limit_cangjie
+              WHERE tx GLOB ? AND ti < ?
               ORDER BY tx, ti, kc)
         GROUP BY substr(tx, 1, ?)
     });
 
     my $common_len;
     my $complete = sub {
-        my ($type, $text) = @_;
+        my ($type, $text, $limit_cangjie) = @_;
 
         my ($prefix, $glob, $index) =
             $text =~ m{^
@@ -218,13 +214,15 @@ sub _init_readline {
             $type = "?" if $type eq "@";
         }
 
+        my $limit = $limit_cangjie ? 16 : 256;
+
         my $comp;
         if ($index) { # Use variant at a given index.
             $comp = $dbh->selectcol_arrayref($kanji_one, undef, $prefix,
                                              $code, $index - 1);
         } elsif ($type eq "@") { # Complete or list next code alternatives.
-            $comp = $dbh->selectcol_arrayref($kanji_next, undef, $prefix,
-                                             $code, $glob, $code_len + 1);
+            $comp = $dbh->selectcol_arrayref($kanji_next, undef, $prefix, $code,
+                                             $glob, $limit, $code_len + 1);
             if (@$comp == 1 && $comp->[0] =~ /(.+) \d| (\D)$/) {
                 # We have only one match which is either "prefixCODE 42"
                 # or "prefixCODE 字".  So for completion we leave either
@@ -237,7 +235,7 @@ sub _init_readline {
             }
         } elsif ($type eq "?") { # List all alternatives (expanded).
             $comp = $dbh->selectcol_arrayref($kanji_expand, undef, $prefix,
-                                             $glob);
+                                             $glob, $limit);
             # Number all alternatives if more than one and also append
             # slash to codes that are the prefixes of the following
             # codes.
@@ -269,10 +267,10 @@ sub _init_readline {
             }
         } elsif ($type eq "*") { # Substitute all alternatives.
             $comp = $dbh->selectcol_arrayref($kanji_all, undef, $prefix,
-                                             $glob, $code_len);
+                                             $glob, $limit, $code_len);
         } else { # ($type eq "%") Substitute next alternative (cycling).
             $comp = $dbh->selectcol_arrayref($kanji_each, undef, $prefix,
-                                             $glob);
+                                             $glob, $limit);
         }
 
         # When there's only one alternative readline (6.3) in "?" mode
@@ -324,10 +322,12 @@ sub _init_readline {
                                                    . $1 . color("reset")/eg;
 
     my $kana_inhibitor = qr/(?:^\s*t\s|(?:^|\s)t:)/;
+    my $full_cangjie = qr/^\s*[hkw]\s/;
 
     use GeekJDict::ReadLine;
-    $self->{readline} = GeekJDict::ReadLine->new($kana_inhibitor, $complete,
-                                                 $display, $cangjie_help);
+    $self->{readline} =
+        GeekJDict::ReadLine->new($kana_inhibitor, $full_cangjie,
+                                 $complete, $display, $cangjie_help);
 }
 
 
