@@ -59,8 +59,7 @@ Before using GeekJDict you have to populate dictionary database.
 First you need to download the following files (use right mouse button
 in the browser and choose "Save as..."):
 
-* [kanjidic2.xml.gz]
-  (http://www.csse.monash.edu.au/~jwb/kanjidic2/kanjidic2.xml.gz)
+* [kanjidic2.xml.gz] (http://www.edrdg.org/kanjidic/kanjidic2.xml.gz)
 * [Unihan.zip] (http://www.unicode.org/Public/UCD/latest/ucd/Unihan.zip)
 * [cangjie5.txt] (https://raw.githubusercontent.com/definite/ibus-table-chinese/master/tables/cangjie/cangjie5.txt)
 * `kanjivg-VERSION.xml.gz` (`VERSION` stands for some date) from [here]
