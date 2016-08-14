@@ -530,3 +530,12 @@ colloquial plain 〜っつう for description 〜という v5u
 sign-of plain 〜がる v5r for plain 〜 adj-na*
 sign-of plain 〜がる v5r for plain 〜い adj-i*
 sign-of plain 〜がる v5r for negative 〜い *
+
+
+#### action without another action
+
+without-doing 〜ないで for negative 〜ない v[15]* vk vs-*
+
+without-doing 〜ず for negative 〜ない v[15]* vk
+without-doing 〜せず for negative 〜しない vs-[ics]
+without-doing 〜せず for negative 〜さない vs-[cs]
