@@ -761,6 +761,32 @@ sub lookup_words {
     my $self = shift;
     my ($query) = @_;
 
+    my $ids = $self->find_words($query);
+
+    my $count = @$ids;
+    unless ($count) {
+        print color("separator"), "No matches found", color("reset"), "\n";
+        return;
+    }
+
+    my $index = 0;
+    foreach my $id (@$ids) {
+        my @word;
+        $self->process(word => $id => sub {
+            my ($it, $tx, $jr, $mr) = @_;
+
+            push @{$word[$it & 7]}, [$tx, $jr, $mr];
+        });
+        $self->print_word(\@word, ++$index, $count);
+    }
+    $self->print_separator("      END");
+}
+
+
+sub find_words {
+    my $self = shift;
+    my ($query) = @_;
+
     my ($globs, @tags) = split /(?:^|\s+)t:\s*/, $query;
     $globs = "" unless defined $globs;
 
@@ -888,23 +914,7 @@ sub lookup_words {
         }
     }
 
-    my $count = @ids;
-    unless ($count) {
-        print color("separator"), "No matches found", color("reset"), "\n";
-        return;
-    }
-
-    my $index = 0;
-    foreach my $id (@ids) {
-        my @word;
-        $self->process(word => $id => sub {
-            my ($it, $tx, $jr, $mr) = @_;
-
-            push @{$word[$it & 7]}, [$tx, $jr, $mr];
-        });
-        $self->print_word(\@word, ++$index, $count);
-    }
-    $self->print_separator("      END");
+    return \@ids;
 }
 
 
