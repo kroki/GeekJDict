@@ -27,7 +27,7 @@ use utf8;
 use open qw(:std :utf8);
 
 
-use GeekJDict::Util qw(get_globs);
+use GeekJDict::Util qw(get_globs globs2regexps);
 
 
 # Following characters SHOULD be narrow and SHOULD NOT match \p{Ea=A}.
@@ -89,6 +89,10 @@ sub new {
     $self->_init_readline;
     $self->_load_meta;
     $self->_prepare_statements;
+
+    $self->_prepare_pronounce($option->{"pronounce-db"});
+    $self->{"pronounce-command"} = $option->{"pronounce-command"};
+    $self->{"pronounce-delay"} = $option->{"pronounce-delay"};
 
     return $self;
 }
@@ -384,6 +388,36 @@ sub _prepare_statements {
 }
 
 
+sub _prepare_pronounce {
+    my $self = shift;
+    my ($pronounce_db) = @_;
+
+    return if $pronounce_db eq "";
+
+    my $dbh = $self->{dbh};
+    my $NoK = $dbh->selectrow_array(q{
+        SELECT id
+        FROM word_meta
+        WHERE ab = 'NoK'
+    });
+    $self->{select_reading} = $dbh->prepare(qq{
+        SELECT it, tx, jr
+        FROM word
+        WHERE id = ? AND it & 7 < 2
+            AND (mr IS NULL OR NOT instr(mr, char($NoK)))
+        ORDER BY it
+    });
+    $dbh->do(q{
+        ATTACH DATABASE 'file:'||?||'?mode=ro' AS pronounce
+    }, undef, $pronounce_db);
+    $self->{select_pronunciation} = $dbh->prepare(q{
+        SELECT a
+        FROM pronounce.pronounce
+        WHERE w = ? AND r = ?
+    });
+}
+
+
 sub count {
     my $self = shift;
     my ($key, $query) = @_;
@@ -435,6 +469,10 @@ sub run {
                              sub { $self->show_writing($input) });
         } elsif ($input =~ s/^g(?:\s+|$)//) {
             $self->with_less(sub { $self->show_grammar($input) });
+        } elsif ($input =~ s/^p(?:\s+|$)//) {
+            my $break;
+            local $SIG{INT} = sub { $break = 1 };
+            $self->pronounce_words($input, \$break);
         } else {
             $self->with_less(sub { $self->lookup_words($input) });
         }
@@ -754,6 +792,77 @@ sub show_grammar {
             print_node($w, $n, $depth + 1);
         }
     }
+}
+
+
+sub pronounce_words {
+    my $self = shift;
+    my ($query, $break) = @_;
+
+    unless ($self->{select_pronunciation}) {
+        print(color("separator"),
+              "Use --pronounce-db option to enable p command",
+              color("reset"), "\n");
+        return;
+    }
+
+    my $ids = $self->find_words($query);
+
+    my $count = @$ids;
+    return unless $count;
+
+    my $filter = qr/^(?:@{[ join "|", globs2regexps($query) ]})$/;
+
+    my $index = 0;
+    foreach my $id (@$ids) {
+        return if $$break;
+        my @word = ([], []);
+        $self->process(reading => $id => sub {
+            my ($it, $tx, $jr) = @_;
+
+            push @{$word[$it & 7]}, [$tx, $jr, $tx =~ /$filter/ ];
+        });
+        # If globs match only English words then we have enable all Japanese.
+        unless (grep { $_->[2] } @{$word[0]}, @{$word[1]}) {
+            foreach my $w (@{$word[0]}) {
+                $w->[2] = 1;
+            }
+        }
+
+        $self->print_separator(sprintf " %6d/%-6d", ++$index, $count);
+        foreach my $r (@{$word[1]}) {
+            my @w = @{$word[0]};
+            @w = @w[map { $_ >> 3 } unpack "U*", $r->[1]] if defined $r->[1];
+            next unless $r->[2] || grep { $_->[2] } @w;
+
+            if (@w) {
+                my $line =  "  " . color("reading") . $r->[0]
+                    . "  " . color("writing") . join(", ", map { $_->[0] } @w);
+                print $self->wrap_line($line, length($r->[0]) * 2 + 4);
+            } else {
+                print "  ", color("writing"), $r->[0];
+                push @w, [""];
+            }
+
+            my $audio;
+            my $reading = $r->[0] =~ s/・//gr;
+            foreach my $w (@w) {
+                $self->{select_pronunciation}->execute($w->[0], $reading);
+                $audio = $self->{select_pronunciation}->fetchrow_array;
+                last if $audio;
+            }
+            print color("separator"), "  no audio" unless $audio;
+            print color("reset"), "\n";
+            if ($audio) {
+                select(undef, undef, undef, $self->{"pronounce-delay"});
+                open(my $fh, '|-:raw', $self->{"pronounce-command"})
+                    or die "Can't run $self->{'pronounce-command'}: $!\n";
+                print $fh $audio;
+                close($fh);
+            }
+        }
+    }
+    $self->print_separator("      END");
 }
 
 

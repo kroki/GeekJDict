@@ -148,6 +148,11 @@ on how inference process works and what grammar rules are available,
 see C<--grammar> option below to learn default location of the
 grammar file.  And you are always welcome to contribute new rules!
 
+=item C<p GLOB...>
+
+Play back pronunciation samples for matching words.  See
+C<--pronounce-db> option below for details.
+
 =item C<h [GLOB...]>
 
 Show command history.  Note that commands starting with whitespace are
@@ -553,6 +558,36 @@ Path to dictionary SQLite database.  Default is F<~/.geekjdict.sqlite>.
 Path to grammar rules file.  Default is F<lib/GeekJDict/grammar.rules>
 in the distribution directory.
 
+=item C<--pronounce-db=F<DB>>
+
+Path to pronunciation sample database.  The file should be an SQLite
+database containing a table of the following prototype:
+
+    CREATE TABLE pronounce (
+        w TEXT NOT NULL,
+        r TEXT NOT NULL,
+        a BLOB NOT NULL,
+
+        PRIMARY KEY (w, r)
+    );
+
+where C<w> and C<r> are writing and reading of the word respectively
+(C<w> may be empty string), and C<a> is a binary audio clip that will
+be passed to F<STDIN> of a C<--pronounce-command>.
+
+Default is empty, i.e. no pronunciation sample database is available
+in GeekJDict distribution.
+
+=item C<--pronounce-command=F<COMMAND>>
+
+Command to play back pronunciation audio clip (read from F<STDIN>).
+Default is F<< mplayer -cache 4096 - &>/dev/null >>.
+
+=item C<--pronounce-delay=SECONDS>
+
+Delay between consecutive pronunciation sample playbacks (in seconds,
+may be fractional).  Default is C<0.0>.
+
 =back
 
 =head2 User interface options
@@ -713,11 +748,15 @@ use Pod::Usage;
 my %option = (
     db => "$ENV{HOME}/.geekjdict.sqlite",
     grammar => "$FindBin::RealBin/lib/GeekJDict/grammar.rules",
+    "pronounce-db" => "",
+    "pronounce-command" => "mplayer -cache 4096 - &>/dev/null",
+    "pronounce-delay" => 0.0,
     "large-references" => 0,
     colors => "",
     "no-colors" => 0,
 );
 GetOptions(\%option, qw(help|h data-info db|d=s grammar|g=s
+                        pronounce-db=s pronounce-command=s pronounce-delay=f
                         large-references colors=s no-colors
                         update=s lang=s@))
     or pod2usage(2);
