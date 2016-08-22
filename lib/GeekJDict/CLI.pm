@@ -815,7 +815,6 @@ sub pronounce_words {
 
     my $index = 0;
     foreach my $id (@$ids) {
-        return if $$break;
         my @word = ([], []);
         $self->process(reading => $id => sub {
             my ($it, $tx, $jr) = @_;
@@ -831,6 +830,7 @@ sub pronounce_words {
 
         $self->print_separator(sprintf " %6d/%-6d", ++$index, $count);
         foreach my $r (@{$word[1]}) {
+            return if $$break;
             my @w = @{$word[0]};
             @w = @w[map { $_ >> 3 } unpack "U*", $r->[1]] if defined $r->[1];
             next unless $r->[2] || grep { $_->[2] } @w;
