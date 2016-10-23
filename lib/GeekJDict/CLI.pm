@@ -47,20 +47,6 @@ sub new {
         exit;
     }
 
-    ######## TODO: This code chunk should eventually be removed ########
-    {
-        my $old = $self->{dbh}->selectrow_array(q{
-            SELECT ti
-            FROM cangjie
-            WHERE ti >= 32
-            LIMIT 1
-        });
-        die("Please redo --update=kanji to bring dictionary database",
-            " to new format\n")
-            if $old;
-    }
-    ####################################################################
-
     $self->{"no-colors"} = $option->{"no-colors"};
     $ENV{ANSI_COLORS_DISABLED} = $option->{"no-colors"};
     $ENV{ANSI_COLORS_ALIASES} = $option->{colors};
