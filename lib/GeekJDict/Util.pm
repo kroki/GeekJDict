@@ -41,6 +41,9 @@ sub _normalize {
     # Remove commas in numbers.
     $_[0] =~ s/([0-9]),(?=[0-9])/$1/g;
 
+    # Instantiate repetitions.
+    $_[0] =~ s/(.)々/$1$1/g;
+
     return $_[0];
 }
 
