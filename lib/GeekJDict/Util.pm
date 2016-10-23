@@ -49,12 +49,12 @@ sub _normalize {
 
 
 sub get_terms {
-    return _normalize($_[0]) =~ /((?:[^\W_・]|[○×◎〃※〒△→←↑↓])+)/g;
+    return _normalize($_[0]) =~ /((?:[^\W_・]|[⻌○×◎〃※〒△→←↑↓])+)/g;
 }
 
 
 sub get_globs {
-    return _normalize($_[0]) =~ /((?:[^\W_・]|[○×◎〃※〒△→←↑↓]|[]^[?*-])+)/g;
+    return _normalize($_[0]) =~ /((?:[^\W_・]|[⻌○×◎〃※〒△→←↑↓]|[]^[?*-])+)/g;
 }
 
 
