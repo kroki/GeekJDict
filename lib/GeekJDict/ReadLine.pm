@@ -51,7 +51,9 @@ sub new {
     my ($point, $line, $replacement);
     my $get_line = sub {
         $point = $attribs->{point};
-        $line = substr($attribs->{line_buffer}, 0, $point);
+        $line = $attribs->{line_buffer};
+        utf8::encode($line) if utf8::is_utf8($line);
+        $line = substr($line, 0, $point);
         utf8::decode($line);
     };
     my $update_line = sub {
