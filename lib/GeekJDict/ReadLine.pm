@@ -165,7 +165,7 @@ sub new {
     # Kanji completion and display functions.
     $attribs->{attempted_completion_function} = sub {
         # We don't need UTF-8 here, so no utf8::decode().
-        $limit_cangjie = substr($_[1], 0, $_[2]) !~ $full_cangjie;
+        $limit_cangjie = $_[1] !~ $full_cangjie;
         return undef;
     };
     $attribs->{completion_entry_function} = sub {
