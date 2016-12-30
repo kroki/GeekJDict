@@ -70,8 +70,8 @@ sub set_db_version {
     });
     $version = ($version & ~(0x3ff << $s)) | ($v << $s);
     $self->{dbh}->do(qq{
-        PRAGMA user_version = ?
-    }, undef, $version);
+        PRAGMA user_version = $version
+    });
 }
 
 
