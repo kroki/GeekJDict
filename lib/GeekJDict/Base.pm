@@ -22,7 +22,6 @@ package GeekJDict::Base;
 use v5.16;
 use strict;
 use warnings qw(all);
-use utf8;
 
 
 sub new {
