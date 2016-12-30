@@ -643,8 +643,8 @@ Possible values for C<TYPE> and data file sources are given below:
 Expects three file names.
 
 F<kanjidic2.xml.gz> file can be obtained from
-L<http://www.edrdg.org/kanjidic/kanjd2index.html> (direct link is
-L<http://www.edrdg.org/kanjidic/kanjidic2.xml.gz>).
+L<http://ftp.monash.edu/pub/nihongo> (direct link is
+L<http://ftp.monash.edu/pub/nihongo/kanjidic2.xml.gz>).
 
 F<Unihan.zip> file can be obtained from
 L<http://www.unicode.org/charts/unihan.html> (direct link is
@@ -668,9 +668,9 @@ direct link).
 Expects one file name.
 
 F<JMdict.gz> file can be obtained from
-L<http://www.edrdg.org/jmdict/j_jmdict.html> (direct link is
-L<ftp://ftp.monash.edu.au/pub/nihongo/JMdict.gz>, or
-L<ftp://ftp.monash.edu.au/pub/nihongo/JMdict_e.gz> for only English
+L<http://ftp.monash.edu/pub/nihongo> (direct link is
+L<http://ftp.monash.edu/pub/nihongo/JMdict.gz>, or
+L<http://ftp.monash.edu/pub/nihongo/JMdict_e.gz> for only English
 translations).
 
 =back
