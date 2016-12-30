@@ -24,6 +24,15 @@ use strict;
 use warnings qw(all);
 
 
+our @VERSION_KANJI_WRITING_WORDS = (0, 0, 0);
+
+my %version_key = (
+    kanji => 0,
+    writing => 1,
+    words => 2,
+);
+
+
 sub new {
     my $class = shift;
     my ($db, $mode) = @_;
@@ -46,6 +55,40 @@ sub new {
     });
 
     return bless { dbh => $dbh }, $class;
+}
+
+
+sub set_db_version {
+    my $self = shift;
+    my ($key) = @_;
+
+    my $i = $version_key{$key};
+    my $v = $VERSION_KANJI_WRITING_WORDS[$i];
+    my $s = $i * 10;
+    my $version = $self->{dbh}->selectrow_array(qq{
+        PRAGMA user_version
+    });
+    $version = ($version & ~(0x3ff << $s)) | ($v << $s);
+    $self->{dbh}->do(qq{
+        PRAGMA user_version = ?
+    }, undef, $version);
+}
+
+
+sub check_db_version {
+    my $self = shift;
+
+    my $version = $self->{dbh}->selectrow_array(qq{
+        PRAGMA user_version
+    });
+    my @update;
+    while (my ($k, $i) = each %version_key) {
+        my $v = ($version >> ($i * 10)) & 0x3ff;
+        push @update, $k
+            if $v != $VERSION_KANJI_WRITING_WORDS[$i];
+    }
+    die "DB version mismatch, please run\n", map { "  --update=$_\n" } @update
+        if @update;
 }
 
 

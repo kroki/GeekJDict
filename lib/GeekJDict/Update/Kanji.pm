@@ -76,6 +76,8 @@ sub new {
 sub _create_tables {
     my $self = shift;
 
+    $self->set_db_version("kanji");
+
     my $dbh = $self->{dbh};
 
     # kanji_meta table:

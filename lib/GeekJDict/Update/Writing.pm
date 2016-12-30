@@ -36,6 +36,8 @@ sub new {
 sub _create_tables {
     my $self = shift;
 
+    $self->set_db_version("writing");
+
     my $dbh = $self->{dbh};
 
     # writing_meta table:

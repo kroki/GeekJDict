@@ -42,6 +42,8 @@ sub new {
     # To be able to rollback failed transaction we have to open DB in rw mode.
     my $self = $class->SUPER::new($option->{db}, "rw");
 
+    $self->check_db_version;
+
     if ($option->{"data-info"}) {
         $self->print_data_info;
         exit;

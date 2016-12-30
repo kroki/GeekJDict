@@ -45,6 +45,8 @@ sub new {
 sub _create_tables {
     my $self = shift;
 
+    $self->set_db_version("words");
+
     my $dbh = $self->{dbh};
 
     # word_meta table:
