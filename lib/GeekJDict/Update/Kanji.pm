@@ -474,6 +474,13 @@ sub _insert_meanings {
 
     my $data = $self->{kanji}->{$kc};
 
+    if ($kc == 0x58F2) {
+        # Unicode 9.0.0 for 売 had a record
+        #   U+58F2  kDefinition     sell; [NOT casing, shell, husk]
+        # which is probably a leak out of a temporal note.
+        $def =~ s/;\s*\[NOT[^]]*\]//;
+    }
+
     # Leave only Japanese-related part.
     $def =~ s/^.*\(J\)\s*//;
     $def =~ s/\(Cant\.\).*//;
