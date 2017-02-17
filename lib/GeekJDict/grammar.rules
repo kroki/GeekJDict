@@ -363,6 +363,8 @@ volitional 〜しよう for plain 〜する vs-[is]
 volitional 〜そう for plain 〜する vs-s
 volitional 〜オう for plain 〜ウ v5* vs-c
 
+colloquial 〜よ for volitional 〜よう v1*
+
 
 #### causative
 
@@ -389,14 +391,15 @@ passive plain 〜アれる v1 for plain 〜ウ v5[^a]* vs-c
 imperative 〜来い for plain 〜来る vk
 imperative 〜こい for plain 〜くる vk
 imperative 〜ろ for plain 〜る v1*
-imperative 〜よ for plain 〜る v1*
 imperative 〜れ for plain 〜れる v1-s
 imperative 〜しろ for plain 〜する vs-i
-imperative 〜せよ for plain 〜する vs-[is]
 imperative 〜エ for plain 〜ウ v5[^a]* vs-c
 imperative 〜い for plain 〜る v5aru
 
 imperative 〜ませ for polite 〜ます v[15]* vk vs-*
+
+archaic-imperative 〜よ for plain 〜る v1*
+archaic-imperative 〜せよ for plain 〜する vs-[is]
 
 
 #### ば-condition
