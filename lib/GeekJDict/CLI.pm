@@ -1373,7 +1373,7 @@ BEGIN {
 A 日曰 t巴眉                    M 一㇀厂⼯ t百石豕 bl光壯
 B 月冂冖爫爫 t炙                N 弓亅㇖㇇㇕⺈㇠㇈㇅⺄ o夕 b今 tr阝乃朵設
 C 金丷 t分 b只 r扒 o小 i四      O 人亻 t乞気 l丘邱 r豕乑飞兆 br尺夫
-D 木 b子 r寸也 t夬皮韋 i五      P 心忄匕七勹 b恭 a比 l切世 r代民式曳 o勿
+D 木 b子 r寸也 t夬皮韋 i五      P 心忄匕七勹 b恭 a比 bl印 l切世 r代民式曳 o勿
 E 水氺氵 a双 b支 br及           Q 手扌 t青 b羊年韋 l夫那 tr桀 i着
 F 火⺌⺍灬 t尙 i平 b不礻示      R 口
 G 土 l垃                        S 尸㇆匚 t己 o⺕尹 a巨 l耳 b乍
