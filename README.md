@@ -12,9 +12,8 @@ expressions, individual kanji, show handwriting of selected
 characters, and trace inflected words to their dictionary form.
 GeekJDict implements powerful glob pattern lookup, direct hiragana and
 katakana input, as well as direct kanji input via built-in support of
-[Cangjie input method]
-(https://en.wikipedia.org/wiki/Cangjie_input_method) with glob
-patterns and completion.
+[Cangjie input method](https://en.wikipedia.org/wiki/Cangjie_input_method)
+with glob patterns and completion.
 
 
 ## Installation
@@ -59,12 +58,12 @@ Before using GeekJDict you have to populate dictionary database.
 First you need to download the following files (use right mouse button
 in the browser and choose "Save as..."):
 
-* [kanjidic2.xml.gz] (http://ftp.monash.edu/pub/nihongo/kanjidic2.xml.gz)
-* [Unihan.zip] (http://www.unicode.org/Public/UCD/latest/ucd/Unihan.zip)
-* [cangjie5.txt] (https://raw.githubusercontent.com/definite/ibus-table-chinese/master/tables/cangjie/cangjie5.txt)
-* `kanjivg-VERSION.xml.gz` (`VERSION` stands for some date) from [here]
-  (https://github.com/KanjiVG/kanjivg/releases/latest)
-* [JMdict.gz] (http://ftp.monash.edu/pub/nihongo/JMdict.gz)
+* [kanjidic2.xml.gz](http://ftp.monash.edu/pub/nihongo/kanjidic2.xml.gz)
+* [Unihan.zip](http://www.unicode.org/Public/UCD/latest/ucd/Unihan.zip)
+* [cangjie5.txt](https://raw.githubusercontent.com/definite/ibus-table-chinese/master/tables/cangjie/cangjie5.txt)
+* `kanjivg-VERSION.xml.gz` (`VERSION` stands for some date) from
+  [here](https://github.com/KanjiVG/kanjivg/releases/latest)
+* [JMdict.gz](http://ftp.monash.edu/pub/nihongo/JMdict.gz)
 
 Then execute the following commands:
 
@@ -106,23 +105,22 @@ with GeekJDict. If not, see <http://www.gnu.org/licenses/>.
 GeekJDict source distribution doesn't contain any data files. However
 GeekJDict is assumed to be used with the following data:
 
-[JMDICT] (http://www.edrdg.org/jmdict/j_jmdict.html) and [KANJIDIC2]
-(http://www.csse.monash.edu.au/~jwb/kanjidic2/) dictionary files are
-the property of the [Electronic Dictionary Research and Development
-Group] (http://www.edrdg.org), and are used in conformance with the
-Group's [licence] (http://www.edrdg.org/edrdg/licence.html).
+[JMDICT](http://www.edrdg.org/jmdict/j_jmdict.html) and
+[KANJIDIC2](http://www.csse.monash.edu.au/~jwb/kanjidic2/) dictionary
+files are the property of the [Electronic Dictionary Research and
+Development Group](http://www.edrdg.org), and are used in conformance
+with the Group's [licence](http://www.edrdg.org/edrdg/licence.html).
 
-[KanjiVG] (http://kanjivg.tagaini.net/index.html) data files are
+[KanjiVG](http://kanjivg.tagaini.net/index.html) data files are
 copyright © 2009-2015 Ulrich Apel and released under the Creative
-Commons Attribution-Share Alike 3.0 [license]
-(http://creativecommons.org/licenses/by-sa/3.0/).
+Commons Attribution-Share Alike 3.0
+[license](http://creativecommons.org/licenses/by-sa/3.0/).
 
-[Unihan] (http://www.unicode.org/charts/unihan.html) data files are
+[Unihan](http://www.unicode.org/charts/unihan.html) data files are
 copyright © 1991-2016 Unicode, Inc. and distributed under the [Terms
-of Use] (http://www.unicode.org/copyright.html).
+of Use](http://www.unicode.org/copyright.html).
 
-[cangjie5.txt]
-(https://github.com/definite/ibus-table-chinese/tree/master/tables/cangjie)
+[cangjie5.txt](https://github.com/definite/ibus-table-chinese/tree/master/tables/cangjie)
 data file is freely redistributable without restriction.
 
 See `license/` directory in GeekJDict source tree for further details.
