@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 #
-# Copyright (C) 2016 Tomash Brechko.  All rights reserved.
+# Copyright (C) 2016-2017 Tomash Brechko.  All rights reserved.
 #
 # This file is part of GeekJDict.
 #
@@ -28,15 +28,34 @@ use utf8;
 use GeekJDict::Util qw(get_terms);
 
 
+my $wadoku_tab = "WaDokuNormal.tab";
+
+
 sub new {
     my $class = shift;
-    my ($option, $jmdict) = @_;
+    my ($option, $jmdict, $wadoku) = @_;
 
     my $self = $class->SUPER::new($option, $jmdict, expand_entities => 0);
 
     @{$self->{lang}}{ @{$option->{lang}} } = () if $option->{lang};
 
     $self->{word_id} = 1000000;  # Leave room for renumbering.
+
+    if ($wadoku) {
+        use Archive::Zip;
+        use Archive::Zip::MemberRead;
+        Archive::Zip::setErrorHandler(sub {
+            # Error reporting in Archive::Zip doesn't always give file name.
+            my $message = join "", @_;
+            $message = "$wadoku: $message" if index($message, $wadoku) == -1;
+            die $message;
+        });
+        my $zip = Archive::Zip->new($wadoku);
+        my $wadoku_tab = $zip->memberNamed($wadoku_tab)
+            or die "Can't find $wadoku_tab inside $wadoku\n";
+
+        $self->{wadoku_tab} = $wadoku_tab->readFileHandle();
+    }
 
     return $self;
 }
@@ -78,7 +97,14 @@ sub _create_tables {
     #         i 4 - ant
     #         i 5 - s_inf
     #         i 6 - lsource
-    #  tx - keb/reb/xref/ant/s_inf/lsource/glosses text.
+    #         i 7 - pronunciation info (accent, devoiced, non-fricative, etc.)
+    #  tx - keb/reb/xref/ant/s_inf/lsource/glosses text, or pronunciation
+    #       info as a sequence of Unicode character codes each encoding
+    #       offset[*:2], type[1:0], where type is:
+    #         i 0 - accent downstep (between morae)
+    #         i 1 - devoiced i or u sound
+    #         i 2 - non-fricative g sound
+    #         i 3 - は or へ particle read as わ or え respectively
     #  jr - re_restr/stagk/stagr/sense as a list of references to it (each
     #       Unicode character code is a reference to it, id is implicit).
     #  mr - metadata as a list of references to word_meta.id (each
@@ -349,6 +375,8 @@ sub _finalize {
     $self->_reorder;
     $self->_create_index;
 
+    $self->_annotate_pronunciation if exists $self->{wadoku_tab};
+
     $self->_limit_cangjie
         if $self->{dbh}->tables(undef, undef, "cangjie", "TABLE");
 }
@@ -484,6 +512,112 @@ sub _create_index {
         $insert->bind_param(1, $tx, DBI::SQL_VARCHAR);
         $insert->bind_param(2, $wi, DBI::SQL_BLOB);
         $insert->execute;
+    }
+}
+
+
+sub _annotate_pronunciation {
+    my $self = shift;
+
+    my $dbh = $self->{dbh};
+
+    my $select_wi = $dbh->prepare(q{
+        SELECT wi
+        FROM term_index
+        WHERE tx = ?
+    });
+    my $select_tx = $dbh->prepare(q{
+        SELECT it, tx
+        FROM word
+        WHERE id = ? AND it & 7 < 2
+    });
+
+    # Parsing of WaDokuNormal.tab is somewhat relaxed.
+    my %info;
+    $self->{wadoku_tab}->input_record_separator("\r");
+    while (my $line = $self->{wadoku_tab}->getline) {
+        utf8::decode($line);
+        my ($w, $a, $a2, $m) = (split /\t/, $line)[1,6,7,13];
+
+        $a = undef unless $a =~ /^\s*\d+\s*$/;
+        $a = $a2 if !defined $a && $a2 =~ /^\s*\d+\s*(?:$|;|,)/;
+        $m = join "", grep { defined } $m =~ m{
+            ( [\p{Hiragana}ー]+ )
+          | ( \[Dev\] ) \P{Hiragana}* (っ?) \P{Hiragana}* ([きしちひぴくすつふぷ])
+          | ( \[NN\] )  \P{Hiragana}* (っ?) \P{Hiragana}* ([がぎぐげご])
+          | ( \[Jo\] )  \P{Hiragana}* ([はへ])
+        }xg;
+        my @r = $m =~ /(\p{Hiragana}[ゃゅょ]?|ー)/g;
+        next unless (defined $a && $a <= @r) || $m =~ /\[/;
+
+        my $p = "";
+        # Accent MUST come first (see CLI.pm:print_japanese()).
+        if (defined $a && $a <= @r) {
+            $a = length join "", @r[0..$a-1] if $a > 0;
+            $p = pack "U", $a << 2 | 0;
+        }
+        if ($m =~ /\[/) {
+            my $o = 0;
+            foreach my $m (split /\[([^]]+)\]/, $m) {
+                if ($m eq "Dev") {
+                    $p .= pack "U", $o << 2 | 1;
+                } elsif ($m eq "NN") {
+                    $p .= pack "U", $o << 2 | 2;
+                } elsif ($m eq "Jo") {
+                    $p .= pack "U", $o << 2 | 3;
+                } else {
+                    $o += length $m;
+                }
+            }
+        }
+
+        $w =~ s/･//g;
+        $w =~ s/(.)々/$1$1/g;
+        my %w;
+        @w{$w =~ /([\p{Han}\p{Block: Hiragana}\p{Block: Katakana}]+)/g} = ();
+        my $r = join "", @r;
+
+        my $wi = $dbh->selectrow_array($select_wi, undef, $r);
+        delete $w{$r};
+        unless (defined $wi) {
+            next unless $w =~ /\p{Katakana}/;
+            $r =~ tr/\x{3041}-\x{3096}/\x{30a1}-\x{30f6}/;
+            $wi = $dbh->selectrow_array($select_wi, undef, $r);
+            next unless defined $wi;
+            delete $w{$r};
+        }
+        my $id = 0;
+        foreach my $d (unpack "w*", $wi) {
+            $id += $d;
+            $select_tx->bind_columns(\my ($it, $tx));
+            $select_tx->execute($id);
+            my ($w, $rit);
+            while ($select_tx->fetch) {
+                if (($it & 7) == 0) {
+                    $w = exists $w{$tx} unless $w;
+                } elsif ($tx eq $r) {
+                    $rit = $it;
+                    last if $w;
+                }
+            }
+            if (defined $rit && ($w || (!defined $w && !keys %w))) {
+                unless (exists $info{"$id $rit"}) {
+                    $info{"$id $rit"} = $p;
+                } elsif ($info{"$id $rit"} ne $p) {
+                    $info{"$id $rit"} = "";
+                }
+            }
+        }
+    }
+
+    my $insert = $dbh->prepare(q{
+        INSERT INTO word (id, it, tx)
+        VALUES (?+0, ?|7, ?)
+    });
+    while (my ($k, $v) = each %info) {
+        next if $v eq "";
+        my ($id, $it) = split / /, $k;
+        $insert->execute($id, $it, $v);
     }
 }
 

@@ -88,6 +88,27 @@ query yields lots of matches, like
 
 but such queries aren't used very often.
 
+=head3 Pronunciation annotation
+
+When corresponding data is available GeekJDict will underline accented
+mora (i.e. the one after which pitch downstep occurs; for "flat" pitch
+words a symbol before the first mora will be underlined to distinguish
+such words from those that do not have accent information).  For words
+with multiple accent variants only one will be shown.
+
+Additionally, certain morae may be highlighted in the following cases:
+
+=over
+
+=item * devoiced vowel in one of き, し, ち, ひ, ぴ or く, す, つ, ふ, ぷ
+
+=item * non-fricative consonant in が, ぎ, ぐ, げ, ご
+
+=item * は or へ particles that are read as わ or え respectively
+
+=back
+
+Finally please keep in mind that annotation data is not complete.
 
 =head2 Commands
 
@@ -604,6 +625,7 @@ Use custom colors.  Argument should be a comma-separated list of
 C<I<KEY>=I<COLOR>> assignments, where each I<KEY> is one of:
 
     separator       writing       reading       tag       text
+    devioced              nonfricative                particle
 
 and each I<COLOR> is a name of ANSI color:
 
@@ -663,15 +685,21 @@ date) can be obtained from
 L<https://github.com/KanjiVG/kanjivg/releases/latest> (there's no
 direct link).
 
-=item C<--update=words F<JMdict.gz>>
+=item C<--update=words F<JMdict.gz> [F<WaDokuNormal.tab.zip>]>
 
-Expects one file name.
+Expects one or two file names.
 
 F<JMdict.gz> file can be obtained from
 L<http://ftp.monash.edu/pub/nihongo> (direct link is
 L<http://ftp.monash.edu/pub/nihongo/JMdict.gz>, or
 L<http://ftp.monash.edu/pub/nihongo/JMdict_e.gz> for only English
 translations).
+
+Optional F<WaDokuNormal.tab.zip> can be obtained from
+L<https://rokuhara.japanologie.kultur.uni-tuebingen.de/owncloud/index.php/s/pRUY7CZ78expBIl>
+(this location is temporal and the file may not be available).  If the
+file is missing there will be no pronunciation info (accent, devoiced,
+non-fricative, particle marks).
 
 =back
 
@@ -692,7 +720,7 @@ option.
 
 =head1 LICENSE
 
-Copyright (C) 2016 Tomash Brechko.  All rights reserved.
+Copyright (C) 2016-2017 Tomash Brechko.  All rights reserved.
 
 GeekJDict is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -719,8 +747,9 @@ Research and Development Group|http://www.edrdg.org>, and are used in
 conformance with the Group's
 L<licence|http://www.edrdg.org/edrdg/licence.html>.
 
-L<F<KanjiVG>|http://kanjivg.tagaini.net/index.html> data files are
-copyright © 2009-2015 Ulrich Apel and released under the Creative
+L<F<KanjiVG>|http://kanjivg.tagaini.net/index.html> and
+L<F<WaDoku>|https://wadoku-ev.de/> data files are copyright ©
+2009-2017 Ulrich Apel & Wadoku e.V. and released under the Creative
 Commons Attribution-Share Alike 3.0
 L<license|http://creativecommons.org/licenses/by-sa/3.0/>.
 
@@ -783,8 +812,9 @@ unless (exists $option{update}) {
     require GeekJDict::Update::Writing;
     $geekjdict = GeekJDict::Update::Writing->new(\%option, @ARGV);
 } elsif ($option{update} eq "words") {
-    pod2usage(-message => "Expected one file name as argument", -exitval => 2)
-        if @ARGV != 1;
+    pod2usage(-message => "Expected one or two file names as arguments",
+              -exitval => 2)
+        if @ARGV < 1 || @ARGV > 2;
 
     require GeekJDict::Update::Words;
     $geekjdict = GeekJDict::Update::Words->new(\%option, @ARGV);

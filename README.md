@@ -64,12 +64,15 @@ in the browser and choose "Save as..."):
 * `kanjivg-VERSION.xml.gz` (`VERSION` stands for some date) from
   [here](https://github.com/KanjiVG/kanjivg/releases/latest)
 * [JMdict.gz](http://ftp.monash.edu/pub/nihongo/JMdict.gz)
+* Optional [WaDokuNormal.tab.zip](https://rokuhara.japanologie.kultur.uni-tuebingen.de/owncloud/index.php/s/pRUY7CZ78expBIl)
+  (this location is temporal and the file may not be available)
+
 
 Then execute the following commands:
 
     $ geekjdict --update=kanji --lang=eng kanjidic2.xml.gz Unihan.zip cangjie5.txt
     $ geekjdict --update=writing kanjivg-VERSION.xml.gz
-    $ geekjdict --update=words --lang=eng JMdict.gz
+    $ geekjdict --update=words --lang=eng JMdict.gz [WaDokuNormal.tab.zip]
 
 You may use additional `--lang` options, or omit `--lang` entirely to
 get all available languages.
@@ -84,7 +87,7 @@ input, glob pattern queries and grammar inferences.
 
 # License
 
-Copyright (C) 2016 Tomash Brechko. All rights reserved.
+Copyright (C) 2016-2017 Tomash Brechko. All rights reserved.
 
 GeekJDict is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
@@ -111,9 +114,10 @@ files are the property of the [Electronic Dictionary Research and
 Development Group](http://www.edrdg.org), and are used in conformance
 with the Group's [licence](http://www.edrdg.org/edrdg/licence.html).
 
-[KanjiVG](http://kanjivg.tagaini.net/index.html) data files are
-copyright © 2009-2015 Ulrich Apel and released under the Creative
-Commons Attribution-Share Alike 3.0
+[KanjiVG](http://kanjivg.tagaini.net/index.html) and
+[WaDoku](https://wadoku-ev.de/) data files are copyright © 2009-2017
+Ulrich Apel & Wadoku e.V. and released under the Creative Commons
+Attribution-Share Alike 3.0
 [license](http://creativecommons.org/licenses/by-sa/3.0/).
 
 [Unihan](http://www.unicode.org/charts/unihan.html) data files are

@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 #
-# Copyright (C) 2016 Tomash Brechko.  All rights reserved.
+# Copyright (C) 2016-2017 Tomash Brechko.  All rights reserved.
 #
 # This file is part of GeekJDict.
 #
@@ -55,11 +55,15 @@ sub new {
     # For environment settings above to take effect we do require+import.
     require Term::ANSIColor;
     Term::ANSIColor->import(qw(color coloralias));
-    coloralias("separator", "bright_black") unless coloralias("separator");
-    coloralias("writing",   "blue")         unless coloralias("writing");
-    coloralias("reading",   "green")        unless coloralias("reading");
-    coloralias("tag",       "bright_black") unless coloralias("tag");
-    coloralias("text",      "clear")        unless coloralias("text");
+    coloralias("separator",   "bright_black") unless coloralias("separator");
+    coloralias("writing",     "blue")         unless coloralias("writing");
+    coloralias("reading",     "green")        unless coloralias("reading");
+    coloralias("tag",         "bright_black") unless coloralias("tag");
+    coloralias("text",        "clear")        unless coloralias("text");
+    coloralias("devoiced",    "bright_black") unless coloralias("devoiced");
+    coloralias("nonfricative","cyan")         unless coloralias("nonfricative");
+    coloralias("particle",    "yellow")       unless coloralias("particle");
+    $self->{"color_no_underline"} = $self->{"no-colors"} ? "" : "\e[24m";
 
     $self->{superscript} = $option->{"large-references"}
         ? [qw(a b c d e f g h i j k l m n o p   r s t u v w x y z)]
@@ -872,7 +876,11 @@ sub lookup_words {
         $self->process(word => $id => sub {
             my ($it, $tx, $jr, $mr) = @_;
 
-            push @{$word[$it & 7]}, [$tx, $jr, $mr];
+            if (($it & 7) < 7) {
+                push @{$word[$it & 7]}, [$tx, $jr, $mr];
+            } else {
+                $word[1][$it >> 3][4] = $tx;
+            }
         });
         $self->print_word(\@word, ++$index, $count);
     }
@@ -1090,7 +1098,36 @@ sub print_japanese {
         }
 
         # Writing or reading (keb, reb).
-        $line .= $e->[0];
+        my $tx = substr($line, -1, 1, "") . $e->[0];
+        if (defined $e->[4]) {
+            foreach my $p (unpack "U*", $e->[4]) {
+                my $t = $p & 3;
+                $p >>= 2;
+                ++$p;
+                my $color =
+                    color(qw(underline devoiced nonfricative particle)[$t]);
+                my $reset = TOPCOLOR;
+                if ($t == 0) {
+                    # Accent comes first and there no colors yet.
+                    substr($tx, $p, 0, $self->{"color_no_underline"});
+                    --$p if substr($tx, $p - 1, 1) =~ /[ゃゅょャュョ]/;
+                    substr($tx, $p - 1, 0, $color);
+                } else {
+                    $tx =~ s<
+                        ^(
+                           (?: \e \[ [^m]* m )*
+                           (?: [^\e] (?: \e \[ [^m]* m )* ){$p}
+                         )
+                         (
+                           (?: [っッ] (?: \e \[ [^m]* m )* )?
+                           [^\e]
+                           (?: (?: \e \[ [^m]* m )* [ゃゅょャュョ])?
+                         )
+                    ><$1$color$2$reset>x;
+                }
+            }
+        }
+        $line .= $tx;
 
         # References to writings (re_restr).
         if (defined $e->[1]) {
