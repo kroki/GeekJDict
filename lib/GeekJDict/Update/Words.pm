@@ -574,17 +574,16 @@ sub _annotate_pronunciation {
         $w =~ s/･//g;
         $w =~ s/(.)々/$1$1/g;
         my %w;
-        @w{$w =~ /([\p{Han}\p{Block: Hiragana}\p{Block: Katakana}]+)/g} = ();
+        @w{grep { /\p{Han}/ }
+           $w =~ /([\p{Han}\p{Block: Hiragana}\p{Block: Katakana}]+)/g} = ();
         my $r = join "", @r;
 
         my $wi = $dbh->selectrow_array($select_wi, undef, $r);
-        delete $w{$r};
         unless (defined $wi) {
             next unless $w =~ /\p{Katakana}/;
             $r =~ tr/\x{3041}-\x{3096}/\x{30a1}-\x{30f6}/;
             $wi = $dbh->selectrow_array($select_wi, undef, $r);
             next unless defined $wi;
-            delete $w{$r};
         }
         my $id = 0;
         foreach my $d (unpack "w*", $wi) {
