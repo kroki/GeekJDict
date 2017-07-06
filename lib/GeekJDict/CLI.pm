@@ -1414,11 +1414,11 @@ D 木 b子 r寸也 t夬皮韋 i五      P 心忄匕七勹 b恭 a比 bl印 l切�
 E 水氺氵 a双 b支 br及           Q 手扌 t青 b羊年韋 l夫那 tr桀 i着
 F 火⺌⺍灬 t尙 i平 b不礻示      R 口
 G 土 l垃                        S 尸㇆匚 t己 o⺕尹 a巨 l耳 b乍
-H 竹⺮㇒⺁ t千白臼𦥑 l牛后凡    T 廿卝廾艹艹艹䒑 i庶曲虛 t革昔共 o卅 b皿豆立關
+H 竹⺮㇒⺁ t千白臼 l牛后凡 i⺨  T 廿卝廾艹艹艹䒑 i庶曲虛 t革昔共 o卅 b皿豆立關
 I 戈丶广厶 t台 b云去 l刃        U 山凵⺃屮屮 br先氾 r孔 bl朔
 J 十宀 i毋 l戎                  V 女㇛㇜㇙㇂ t幺 a巛 l收以 b亡甚艮展衣鼠
-K 大乂疒 l右力九 b耂文父丈 t⺨  W 田 o図圕罒母毋
-L 中丨衤⺺ a川 t隶              Y 卜亠⺀辶辶 t上貞文主言幷 b下冬寒 r朴外 i母図
+K 大乂疒 l右力九 b耂文父丈 o⺨  W 田 o図圕罒母毋
+L 中丨衤⺺ a川 t隶 i罒          Y 卜亠⺀辶辶 t上貞文主言幷 b下冬寒 r朴外 i母図
     t=top    b=bottom    l=left    r=right    o=outer    i=inner    a=all
 END
 }
