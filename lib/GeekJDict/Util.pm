@@ -33,10 +33,15 @@ BEGIN {
 
 sub _normalize {
     use Unicode::Normalize;
+    # To avoid digraph expansion during normalization first replace
+    # them with dummies from Private Use Area (U+E000..U+F8FF).
+    $_[0] =~ tr/ゟヿ/\x{e000}\x{e001}/;
     # Fold case and remove diacritical marks.
     $_[0] = NFKD fc $_[0];
     $_[0] =~ s/\p{Block: Combining_Diacritical_Marks}//g;
     $_[0] = NFC $_[0];
+    # Restore digraphs.
+    $_[0] =~ tr/\x{e000}\x{e001}/ゟヿ/;
 
     # Remove commas in numbers.
     $_[0] =~ s/([0-9]),(?=[0-9])/$1/g;
