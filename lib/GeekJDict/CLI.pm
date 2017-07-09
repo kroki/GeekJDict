@@ -69,10 +69,13 @@ sub new {
         ? [qw(a b c d e f g h i j k l m n o p   r s t u v w x y z)]
         : [qw(ᵃ ᵇ ᶜ ᵈ ᵉ ᶠ ᵍ ʰ ⁱ ʲ ᵏ ˡ ᵐ ⁿ ᵒ ᵖ   ʳ ˢ ᵗ ᵘ ᵛ ʷ ˣ ʸ ᶻ)];
 
-    # --RAW-CONTROL-CHARS makes regexp search work even when what
-    # appears to be at the line start is preceded by color command.
-    $self->{less} = [qw(less --no-init --RAW-CONTROL-CHARS --ignore-case
-                             --quit-if-one-screen)] if -t STDIN;
+    if (-t STDIN) {
+        $ENV{LESSSECURE} = 1;  # Mainly to disable 's' command.
+        # --RAW-CONTROL-CHARS makes regexp search work even when what
+        # appears to be at the line start is preceded by color command.
+        $self->{less} = [qw(less --no-init --RAW-CONTROL-CHARS --ignore-case
+                                 --quit-if-one-screen)];
+    }
 
     use GeekJDict::Grammar;
     $self->{grammar} = GeekJDict::Grammar->new($option->{grammar},
