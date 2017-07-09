@@ -561,7 +561,7 @@ sub lookup_kanji {
         $self->process(cangjie => $kc => sub {
             my ($ti, $tx) = @_;
 
-            push @{$k[9][($ti >> 3) & 1]}, $tx;
+            push @{$k[10][($ti >> 3) & 1]}, $tx;
         });
         $self->print_kanji($k, \@k, ++$index, $count);
     }
@@ -597,26 +597,32 @@ sub print_kanji {
     my $line = join("  $item", @line) . color("reset");
     print $self->wrap_line($line, 7), "\n";
 
-    @line = ();
+    if (exists $kanji->[8]) {
+        my $variants = join "  ", split "", $kanji->[8];
+        my $line = "     " . color("tag") . $item . "Variant of: "
+            . color("writing") . $variants . color("reset");
+        print $self->wrap_line($line, 16), "\n";
+    }
     if (exists $kanji->[9]) {
+        my $variants = join "  ", split "", $kanji->[9];
+        my $line = "     " . color("tag") . $item . "Variants: "
+            . color("writing") . $variants . color("reset");
+        print $self->wrap_line($line, 16), "\n";
+    }
+
+    @line = ();
+    if (exists $kanji->[10]) {
         my $cangjie = "Cangjie:";
-        $cangjie .= " " . join(", ", @{$kanji->[9][0]})
-            if exists $kanji->[9][0];
-        $cangjie .= " (" . join(", ", @{$kanji->[9][1]}) . ")"
-            if exists $kanji->[9][1];
+        $cangjie .= " " . join(", ", @{$kanji->[10][0]})
+            if exists $kanji->[10][0];
+        $cangjie .= " (" . join(", ", @{$kanji->[10][1]}) . ")"
+            if exists $kanji->[10][1];
         push @line, $cangjie;
     }
     if (@line) {
         my $line = "   "
             . color("tag") . join("  $item", "", @line) . color("reset");
         print $self->wrap_line($line, 7), "\n";
-    }
-
-    if (exists $kanji->[8]) {
-        my $variants = join "  ", split "", $kanji->[8];
-        my $line = "     " . color("tag") . $item . "Variants: "
-            . color("writing") . $variants . color("reset");
-        print $self->wrap_line($line, 16), "\n";
     }
 
     my $has_reading = 0;

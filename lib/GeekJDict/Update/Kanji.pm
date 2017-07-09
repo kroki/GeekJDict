@@ -110,9 +110,10 @@ sub _create_tables {
     #         5 - strokes
     #         6 - freq
     #         7 - grade
-    #         8 - variants
+    #         8 - variant of
+    #         9 - variants
     #  tx - text of the above (tab-separated for types 0-3, number for
-    #  4-7, string of kanji for 8).
+    #  4-7, string of kanji for 8,9).
     $dbh->do(q{ DROP TABLE IF EXISTS kanji });
     $dbh->do(q{
         CREATE TABLE kanji (
@@ -199,7 +200,7 @@ sub _init_parser {
         freq         => $set_xml,
         variant      => sub { return if $xml->getAttribute("var_type") ne "ucs";
                               push(@{$kanji{variant}},
-                                   chr hex $xml->readInnerXml); },
+                                   hex $xml->readInnerXml); },
         reading      => sub { my $type = $xml->getAttribute("r_type");
                               if ($type =~ /^ja_(on|kun)$/) {
                                   push @{$kanji{$1}}, $xml->readInnerXml;
@@ -289,8 +290,15 @@ sub _process_kanji {
     }
 
     if (exists $kanji->{variant}) {
-        my $tx = join "", @{$kanji->{variant}};
+        my $tx = pack "U*", @{$kanji->{variant}};
         $self->{kanji_insert}->execute($kc, 8, $tx);
+
+        for my $kc (@{$kanji->{variant}}) {
+            eval {
+                $self->{kanji_insert}->execute($kc, 9, $kj);
+            };
+            $self->{kanji_append}->execute($kc, 9, $kj) if $@;
+        }
     }
 }
 
