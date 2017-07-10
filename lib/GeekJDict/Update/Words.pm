@@ -433,7 +433,7 @@ sub _reorder {
     my $meta_id = $dbh->prepare(q{
         SELECT id
         FROM word_meta
-        WHERE ki GLOB ? AND ab GLOB ?
+        WHERE id > 0 AND ki GLOB ? AND ab GLOB ?
     });
     %GeekJDict::Update::Words::StaticRank::renumber = ();
     while (my ($i, $o) = each @static_order) {
@@ -535,7 +535,11 @@ sub _annotate_pronunciation {
     # Parsing of WaDokuNormal.tab is somewhat relaxed.
     my %info;
     $self->{wadoku_tab}->input_record_separator("\r");
-    while (my $line = $self->{wadoku_tab}->getline) {
+    my $line = $self->{wadoku_tab}->getline;
+    if ($line =~ / vom (\d+)\.(\d+)\.(\d+)/) {
+        $self->{meta_insert}->execute(-2, "WaDoku", "created", "$3-$2-$1");
+    }
+    while ($line = $self->{wadoku_tab}->getline) {
         utf8::decode($line);
         my ($w, $a, $a2, $m) = (split /\t/, $line)[1,6,7,13];
 

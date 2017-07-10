@@ -333,10 +333,11 @@ sub _init_readline {
 sub _load_meta {
     my $self = shift;
 
-    # We assume that word_meta has no gaps and first ID is zero.
+    # We assume that word_meta has no gaps.
     $self->{meta} = $self->{dbh}->selectall_arrayref(q{
         SELECT ki, ab, ds
         FROM word_meta
+        WHERE id >= 0
         ORDER BY id
     });
 }
@@ -1354,11 +1355,12 @@ sub print_data_info {
         SELECT printf('%-10s %s %s'||x'0a', ki, ky, vl)
         FROM writing_meta
     })};
-    print $dbh->selectrow_array(q{
+    print @{$dbh->selectcol_arrayref(q{
         SELECT printf('%-10s %s %s'||x'0a', ki, ab, ds)
         FROM word_meta
-        WHERE id = 0
-    });
+        WHERE id <= 0
+        ORDER BY id DESC
+    })};
     print "Total ", $dbh->selectrow_array(q{
         SELECT max(id)
         FROM word
