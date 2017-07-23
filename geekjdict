@@ -34,7 +34,7 @@ It is advised to run GeekJDict in a separate terminal window with
 enlarged font (and black background).  For instance the author runs it
 as
 
-  gnome-terminal --zoom=2 --command geekjdict
+  gnome-terminal --zoom=2 -- geekjdict
 
 =head2 Lookups
 
