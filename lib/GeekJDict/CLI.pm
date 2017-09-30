@@ -63,7 +63,6 @@ sub new {
     coloralias("devoiced",    "bright_black") unless coloralias("devoiced");
     coloralias("nonfricative","cyan")         unless coloralias("nonfricative");
     coloralias("particle",    "yellow")       unless coloralias("particle");
-    $self->{"color_no_underline"} = $self->{"no-colors"} ? "" : "\e[24m";
 
     $self->{superscript} = $option->{"large-references"}
         ? [qw(a b c d e f g h i j k l m n o p   r s t u v w x y z)]
@@ -1119,7 +1118,7 @@ sub print_japanese {
                 my $reset = TOPCOLOR;
                 if ($t == 0) {
                     # Accent comes first and there no colors yet.
-                    substr($tx, $p, 0, $self->{"color_no_underline"} . $reset);
+                    substr($tx, $p, 0, color("reset") . $reset);
                     --$p if substr($tx, $p - 1, 1) =~ /[ゃゅょャュョ]/;
                     substr($tx, $p - 1, 0, $color);
                 } else {
