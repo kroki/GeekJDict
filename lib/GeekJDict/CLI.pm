@@ -1119,7 +1119,7 @@ sub print_japanese {
                 my $reset = TOPCOLOR;
                 if ($t == 0) {
                     # Accent comes first and there no colors yet.
-                    substr($tx, $p, 0, $self->{"color_no_underline"});
+                    substr($tx, $p, 0, $self->{"color_no_underline"} . $reset);
                     --$p if substr($tx, $p - 1, 1) =~ /[ゃゅょャュョ]/;
                     substr($tx, $p - 1, 0, $color);
                 } else {
