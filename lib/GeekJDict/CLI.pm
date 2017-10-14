@@ -287,19 +287,19 @@ sub _init_readline {
         my ($matches, $max, $width) = @_;
 
         # First element in @$matches is readline substitution.
-        my $len = @$matches - 1;
+        my $count = @$matches - 1;
         # Do not count last dummy alternative.
-        --$len if $matches->[-1] eq "";
+        --$count if $matches->[-1] eq "";
 
         my $columns = int(($width + 2) / ($max - $common_len + 2)) || 1;
-        my $rows = int(($len + $columns - 1) / $columns);
+        my $rows = int(($count + $columns - 1) / $columns);
 
         print "\n";  # Leave input line.
         $self->with_less(sub {
             for (my $r = 1; $r <= $rows; ++$r) {
                 for (my $c = 0; $c < $columns; ++$c) {
                     my $i = $c * $rows + $r;
-                    last if $i > $len;
+                    last if $i > $count;
 
                     my $m = $matches->[$i];
                     utf8::decode($m);
