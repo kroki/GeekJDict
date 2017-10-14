@@ -192,10 +192,10 @@ sub new {
         return undef;
     };
     $attribs->{completion_display_matches_hook} = sub {
-        my ($matches, $len, $max) = @_;
+        my ($matches) = @_;
 
         my (undef, $width) = $readline->get_screen_size;
-        $display_kanji_list->($matches, $max, $width);
+        $display_kanji_list->($matches, $width);
 
         # This is what readline-6.3 does after displaying completions.
         $readline->forced_update_display;

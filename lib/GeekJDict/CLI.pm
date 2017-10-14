@@ -169,14 +169,14 @@ sub _init_readline {
         GROUP BY substr(tx, 1, ?)
     });
     my $kanji_expand = $dbh->prepare(q{
-        SELECT ?||tx||' '||char(kc)
+        SELECT ?||tx||'  '||char(kc)
         FROM cangjie
         WHERE tx GLOB ? AND ti < ?
         ORDER BY tx, ti, kc
     });
     my $kanji_next = $dbh->prepare(q{
-        SELECT ?||(CASE WHEN tx = ? THEN tx||'/ '||group_concat(char(kc), '')
-                        WHEN count(*) = 1 THEN tx||' '||char(kc)
+        SELECT ?||(CASE WHEN tx = ? THEN tx||'/  '||group_concat(char(kc), '')
+                        WHEN count(*) = 1 THEN tx||'  '||char(kc)
                         ELSE common_prefix(tx||'/')||' '||count(*) END)
         FROM (SELECT kc, tx AS tx
               FROM cangjie
@@ -185,7 +185,7 @@ sub _init_readline {
         GROUP BY substr(tx, 1, ?)
     });
 
-    my $common_len;
+    my ($common_len, $common_max);
     my $complete = sub {
         my ($type, $text, $limit_cangjie) = @_;
 
@@ -223,13 +223,13 @@ sub _init_readline {
                                              $glob, $limit, $code_len + 1);
             if (@$comp == 1 && $comp->[0] =~ /(.+) \d| (\D)$/) {
                 # We have only one match which is either "prefixCODE 42"
-                # or "prefixCODE 字".  So for completion we leave either
+                # or "prefixCODE  字".  So for completion we leave either
                 # the code ("prefixCODE") or the character ("prefix字").
                 $comp->[0] = $1 // $prefix . $2;
-            } elsif (@$comp && $comp->[0] =~ /(.+) (\D\D+)/) {
+            } elsif (@$comp && $comp->[0] =~ /(.+)  (\D\D+)/) {
                 # Number immediate alternatives if more than one.
                 my $i = 0;
-                splice(@$comp, 0, 1, map { ++$i; "$1$i $_" } split "", $2);
+                splice(@$comp, 0, 1, map { ++$i; "$1$i  $_" } split "", $2);
             }
         } elsif ($type eq "?") { # List all alternatives (expanded).
             $comp = $dbh->selectcol_arrayref($kanji_expand, undef, $prefix,
@@ -240,27 +240,27 @@ sub _init_readline {
             if (@$comp > 1) {
                 my ($i, $cp) = (0);
                 for (my $j = 0; $j < @$comp; ++$j) {
-                    my ($c) = $comp->[$j] =~ /^(.+) /;
+                    my ($c) = $comp->[$j] =~ /^(.+)  /;
                     if ($cp) {
                         if ($cp eq $c) {
                             ++$i;
-                            $comp->[$j - 1] =~ s| |/$i |;
+                            $comp->[$j - 1] =~ s|  |/$i  |;
                         } elsif ($i) {
                             ++$i;
-                            $comp->[$j - 1] =~ s| |/$i |;
+                            $comp->[$j - 1] =~ s|  |/$i  |;
                             $i = 0;
                         } elsif ($cp eq substr($c, 0, length($cp))) {
-                            $comp->[$j - 1] =~ s| |/ |;
+                            $comp->[$j - 1] =~ s|  |/  |;
                         }
                     }
                     $cp = $c;
                 }
                 if ($i) {
                     ++$i;
-                    $comp->[-1] =~ s| |/$i |;
+                    $comp->[-1] =~ s|  |/$i  |;
                 }
             } elsif (@$comp) {
-                # If match is exact remove space before character.
+                # If match is exact remove one space before character.
                 ++$common_len if substr($comp->[0], $common_len, 1) eq " ";
             }
         } elsif ($type eq "*") { # Substitute all alternatives.
@@ -269,6 +269,12 @@ sub _init_readline {
         } else { # ($type eq "%") Substitute next alternative (cycling).
             $comp = $dbh->selectcol_arrayref($kanji_each, undef, $prefix,
                                              $glob, $limit);
+        }
+
+        $common_max = 0;
+        foreach my $c (@$comp) {
+            my $l = length($c);
+            $common_max = $l if $common_max < $l;
         }
 
         # When there's only one alternative readline (6.3) in "?" mode
@@ -284,14 +290,14 @@ sub _init_readline {
         return $comp;
     };
     my $display = sub {
-        my ($matches, $max, $width) = @_;
+        my ($matches, $width) = @_;
 
         # First element in @$matches is readline substitution.
         my $count = @$matches - 1;
         # Do not count last dummy alternative.
         --$count if $matches->[-1] eq "";
 
-        my $columns = int(($width + 2) / ($max - $common_len + 2)) || 1;
+        my $columns = int(($width + 2) / ($common_max - $common_len + 2)) || 1;
         my $rows = int(($count + $columns - 1) / $columns);
 
         print "\n";  # Leave input line.
@@ -303,10 +309,10 @@ sub _init_readline {
 
                     my $m = $matches->[$i];
                     utf8::decode($m);
-                    my $len = $max - length($m);
+                    my $len = $common_max - length($m);
                     substr($m, 0, $common_len, "");
                     $m =~ s/(?=\d+$)/" " x $len . color("tag")/e
-                        or $m =~ s/(?=.$)/" " x ($len - 1) . color("writing")/e;
+                        or $m =~ s/ (?=.$)/" " x $len . color("writing")/e;
                     print "  " if $c;
                     print $m, color("reset");
                 }
