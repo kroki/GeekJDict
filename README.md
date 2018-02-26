@@ -64,8 +64,8 @@ in the browser and choose "Save as..."):
 * `kanjivg-VERSION.xml.gz` (`VERSION` stands for some date) from
   [here](https://github.com/KanjiVG/kanjivg/releases/latest)
 * [JMdict.gz](http://ftp.monash.edu/pub/nihongo/JMdict.gz)
-* Optional [WaDokuNormal.tab.zip](https://rokuhara.japanologie.kultur.uni-tuebingen.de/owncloud/index.php/s/pRUY7CZ78expBIl)
-  (this location is temporal and the file may not be available)
+* [WaDokuNormal.tab.zip](https://github.com/kroki/GeekJDict/raw/data/WaDokuNormal.tab.zip)
+  (accent and pronunciation data, optional but highly recommended)
 
 
 Then execute the following commands:
