@@ -695,11 +695,10 @@ L<http://ftp.monash.edu/pub/nihongo/JMdict.gz>, or
 L<http://ftp.monash.edu/pub/nihongo/JMdict_e.gz> for only English
 translations).
 
-Optional F<WaDokuNormal.tab.zip> can be obtained from
-L<https://rokuhara.japanologie.kultur.uni-tuebingen.de/owncloud/index.php/s/pRUY7CZ78expBIl>
-(this location is temporal and the file may not be available).  If the
-file is missing there will be no pronunciation info (accent, devoiced,
-non-fricative, particle marks).
+F<WaDokuNormal.tab.zip> can be obtained from
+L<https://github.com/kroki/GeekJDict/raw/data/WaDokuNormal.tab.zip>
+(optional but highly recommended pronunciation info (accent, devoiced,
+non-fricative, particle marks)).
 
 =back
 
