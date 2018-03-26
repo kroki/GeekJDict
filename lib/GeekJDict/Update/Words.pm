@@ -139,9 +139,9 @@ sub _init_parser {
     use XML::LibXML::Reader qw(:types);
 
     unless ($xml->read && $xml->nodeType == XML_READER_TYPE_COMMENT
-            && $xml->value =~ /^\s*\QRev 1.08\E\b/) {
+            && $xml->value =~ /^\s*\QRev 1.09\E\b/) {
         my $revision = $xml->value =~ s/\n.*//mr;
-        die "unsupported JMdict DTD $revision, expected 1.08\n";
+        die "unsupported JMdict DTD $revision, expected 1.09\n";
     }
     while ($xml->read && $xml->nodeType != XML_READER_TYPE_ELEMENT) {
         if ($xml->nodeType == XML_READER_TYPE_COMMENT
@@ -301,7 +301,9 @@ sub _process_word {
     }
 
     foreach my $sense (@{$word->{sense}}) {
-        my $tx = exists $sense->{gloss} ? join("\t", @{$sense->{gloss}}) : "";
+        next unless exists $sense->{gloss};
+
+        my $tx = join("\t", @{$sense->{gloss}});
 
         my $jr = "";
         $jr .= _encode_jr($sense->{stagk} => \%kit)
