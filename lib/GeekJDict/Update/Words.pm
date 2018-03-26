@@ -356,8 +356,10 @@ sub _process_word {
                 if ($lang ne "eng") {
                     my $kind = '@xml:lang';
                     my $ref = \$reference{"$kind/$lang"};
-                    use Locale::Codes::Language;
-                    $$ref = code2language($lang, "alpha-3") unless $$ref;
+                    unless ($$ref) {
+                        use Locale::Codes::Language;
+                        $$ref = code2language($lang, "alpha-3") // $lang;
+                    }
                     $mr = $self->_encode_mr($kind => [$lang]);
                 }
 
