@@ -554,6 +554,9 @@ sub _annotate_pronunciation {
         my @r = $m =~ /(\p{Hiragana}[ゃゅょ]?|ー)/g;
         next unless (defined $a && $a <= @r) || $m =~ /\[/;
 
+        # Fix cases when accent is mistakenly placed on っ (see 殺虫剤).
+        ++$a if defined $a && $a > 0 && $a < @r && $r[$a-1] eq 'っ';
+
         my $p = "";
         # Accent MUST come first (see CLI.pm:print_japanese()).
         if (defined $a && $a <= @r) {
