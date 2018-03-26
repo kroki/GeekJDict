@@ -63,7 +63,9 @@ in the browser and choose "Save as..."):
 * [cangjie5.txt](https://raw.githubusercontent.com/definite/ibus-table-chinese/master/tables/cangjie/cangjie5.txt)
 * `kanjivg-VERSION.xml.gz` (`VERSION` stands for some date) from
   [here](https://github.com/KanjiVG/kanjivg/releases/latest)
-* [JMdict.gz](http://ftp.monash.edu/pub/nihongo/JMdict.gz)
+* [JMdict.gz](http://ftp.monash.edu/pub/nihongo/JMdict.gz) (or use
+  [JMdict_e.gz](http://ftp.monash.edu/pub/nihongo/JMdict_e.gz) if you need only
+  English glosses)
 * [WaDokuNormal.tab.zip](https://github.com/kroki/GeekJDict/raw/data/WaDokuNormal.tab.zip)
   (accent and pronunciation data, optional but highly recommended)
 
