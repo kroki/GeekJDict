@@ -1219,11 +1219,6 @@ sub print_sense {
     $line .= LOCALCOLOR(color("tag"), " ", join(", ", @ab))
         if @ab;
 
-    # Sense info (s_inf).
-    $line .= LOCALCOLOR(color("tag"),
-                        " (", join("; ", map { $_->[0] } @{$sense->[5]}), ")")
-        if defined $sense->[5];
-
     # Source language (lsource).
     if (defined $sense->[6]) {
         my @sources;
@@ -1245,6 +1240,11 @@ sub print_sense {
         }
         $line .= LOCALCOLOR(color("tag"), " [from", join(",", @sources), "]");
     }
+
+    # Sense info (s_inf).
+    $line .= LOCALCOLOR(color("tag"),
+                        " (", join("; ", map { $_->[0] } @{$sense->[5]}), ")")
+        if defined $sense->[5];
 
     # Separator.
     $line .= ":";
