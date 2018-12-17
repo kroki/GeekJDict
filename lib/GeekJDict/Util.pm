@@ -43,6 +43,9 @@ sub _normalize {
     # Restore digraphs.
     $_[0] =~ tr/\x{e000}\x{e001}/ゟヿ/;
 
+    # Remove "・" separators in katakana.
+    $_[0] =~ s/・//g;
+
     # Remove commas in numbers.
     $_[0] =~ s/([0-9]),(?=[0-9])/$1/g;
 
@@ -54,12 +57,12 @@ sub _normalize {
 
 
 sub get_terms {
-    return _normalize($_[0]) =~ /((?:[^\W_・]|[⻌○×◎〃※〒△→←↑↓])+)/g;
+    return _normalize($_[0]) =~ /((?:[^\W_]|[⻌○×◎〃※〒△→←↑↓])+)/g;
 }
 
 
 sub get_globs {
-    return _normalize($_[0]) =~ /((?:[^\W_・]|[⻌○×◎〃※〒△→←↑↓]|[]^[?*-])+)/g;
+    return _normalize($_[0]) =~ /((?:[^\W_]|[⻌○×◎〃※〒△→←↑↓]|[]^[?*-])+)/g;
 }
 
 
