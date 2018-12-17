@@ -108,7 +108,7 @@ BEGIN {
     # Geminates.
     my %geminate;
     while (my ($mora, $romaji) = each %romaji) {
-        if ($romaji =~ /^([kstcgzjdhbp])/) {
+        if ($romaji =~ /^([kstcgzjdhfbp])/) {
             $geminate{"っ$mora"} = "$1$romaji";
         }
     }
