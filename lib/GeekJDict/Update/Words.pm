@@ -487,8 +487,9 @@ sub _create_index {
     $select->bind_columns(\my ($id, $tx));
     $select->execute;
     while ($select->fetch) {
-        my @terms = get_terms($tx);
-        foreach my $t (@terms) {
+        my %term;
+        @term{get_terms($tx)} = ();
+        foreach my $t (keys %term) {
             push @{$terms{$t}}, $id;
         }
     }
