@@ -1369,7 +1369,12 @@ sub print_data_info {
     print "Total ", $dbh->selectrow_array(q{
         SELECT max(id)
         FROM word
-    }), " words, ";
+    }), " words (";
+    print $dbh->selectrow_array(q{
+        SELECT count(DISTINCT id)
+        FROM word
+        WHERE it & 7 = 7
+    }), " with pronunciation info), ";
     print $dbh->selectrow_array(q{
         SELECT count(DISTINCT kc)
         FROM kanji
