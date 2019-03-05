@@ -66,7 +66,7 @@ in the browser and choose "Save as..."):
 * [JMdict.gz](http://ftp.monash.edu/pub/nihongo/JMdict.gz) (or use
   [JMdict_e.gz](http://ftp.monash.edu/pub/nihongo/JMdict_e.gz) if you need only
   English glosses)
-* [WaDokuNormal.tab.zip](https://github.com/kroki/GeekJDict/raw/data/WaDokuNormal.tab.zip)
+* `WaDokuDa.tab` from [here](https://github.com/WaDoku/WaDokuJT-Data)
   (accent and pronunciation data, optional but highly recommended)
 
 
@@ -74,7 +74,7 @@ Then execute the following commands:
 
     $ geekjdict --update=kanji --lang=eng kanjidic2.xml.gz Unihan.zip cangjie5.txt
     $ geekjdict --update=writing kanjivg-VERSION.xml.gz
-    $ geekjdict --update=words --lang=eng JMdict.gz [WaDokuNormal.tab.zip]
+    $ geekjdict --update=words --lang=eng JMdict.gz [WaDokuDa.tab[.gz]]
 
 You may use additional `--lang` options, or omit `--lang` entirely to
 get all available languages.
@@ -117,7 +117,7 @@ Development Group](http://www.edrdg.org), and are used in conformance
 with the Group's [licence](http://www.edrdg.org/edrdg/licence.html).
 
 [KanjiVG](http://kanjivg.tagaini.net/index.html) and
-[WaDoku](https://wadoku-ev.de/) data files are copyright © 2009-2017
+[WaDoku](https://wadoku-ev.de/) data files are copyright © 2009-2019
 Ulrich Apel & Wadoku e.V. and released under the Creative Commons
 Attribution-Share Alike 3.0
 [license](http://creativecommons.org/licenses/by-sa/3.0/).

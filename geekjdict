@@ -685,7 +685,7 @@ date) can be obtained from
 L<https://github.com/KanjiVG/kanjivg/releases/latest> (there's no
 direct link).
 
-=item C<--update=words F<JMdict.gz> [F<WaDokuNormal.tab.zip>]>
+=item C<--update=words F<JMdict.gz> [F<WaDokuDa.tab[.gz]>]>
 
 Expects one or two file names.
 
@@ -695,8 +695,7 @@ L<http://ftp.monash.edu/pub/nihongo/JMdict.gz>, or
 L<http://ftp.monash.edu/pub/nihongo/JMdict_e.gz> for only English
 translations).
 
-F<WaDokuNormal.tab.zip> can be obtained from
-L<https://github.com/kroki/GeekJDict/raw/data/WaDokuNormal.tab.zip>
+F<WaDokuDa.tab> can be obtained from L<https://github.com/WaDoku/WaDokuJT-Data>
 (optional but highly recommended pronunciation info (accent, devoiced,
 non-fricative, particle marks)).
 
@@ -748,7 +747,7 @@ L<licence|http://www.edrdg.org/edrdg/licence.html>.
 
 L<F<KanjiVG>|http://kanjivg.tagaini.net/index.html> and
 L<F<WaDoku>|https://wadoku-ev.de/> data files are copyright ©
-2009-2017 Ulrich Apel & Wadoku e.V. and released under the Creative
+2009-2019 Ulrich Apel & Wadoku e.V. and released under the Creative
 Commons Attribution-Share Alike 3.0
 L<license|http://creativecommons.org/licenses/by-sa/3.0/>.
 

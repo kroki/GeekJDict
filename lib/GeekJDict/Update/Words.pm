@@ -28,9 +28,6 @@ use utf8;
 use GeekJDict::Util qw(get_terms);
 
 
-my $wadoku_tab = "WaDokuNormal.tab";
-
-
 sub new {
     my $class = shift;
     my ($option, $jmdict, $wadoku) = @_;
@@ -42,19 +39,10 @@ sub new {
     $self->{word_id} = 1000000;  # Leave room for renumbering.
 
     if ($wadoku) {
-        use Archive::Zip;
-        use Archive::Zip::MemberRead;
-        Archive::Zip::setErrorHandler(sub {
-            # Error reporting in Archive::Zip doesn't always give file name.
-            my $message = join "", @_;
-            $message = "$wadoku: $message" if index($message, $wadoku) == -1;
-            die $message;
-        });
-        my $zip = Archive::Zip->new($wadoku);
-        my $wadoku_tab = $zip->memberNamed($wadoku_tab)
-            or die "Can't find $wadoku_tab inside $wadoku\n";
+        open(my $fh, ($wadoku =~ /\.gz$/ ? "<:gzip" : "<"), $wadoku)
+            or die "Can't open $wadoku: $!\n";
 
-        $self->{wadoku_tab} = $wadoku_tab->readFileHandle();
+        $self->{wadoku_tab} = $fh;
     }
 
     return $self;
@@ -537,19 +525,19 @@ sub _annotate_pronunciation {
         WHERE id = ? AND it & 7 < 2
     });
 
-    # Parsing of WaDokuNormal.tab is somewhat relaxed.
+    # Parsing of WaDokuDa.tab is somewhat relaxed.
     my %info;
-    $self->{wadoku_tab}->input_record_separator("\r");
-    my $line = $self->{wadoku_tab}->getline;
+    my $fh = $self->{wadoku_tab};
+    my $line = <$fh>;
     if ($line =~ / vom (\d+)\.(\d+)\.(\d+)/) {
         $self->{meta_insert}->execute(-2, "WaDoku", "created", "$3-$2-$1");
     }
-    while ($line = $self->{wadoku_tab}->getline) {
+    while ($line = <$fh>) {
         utf8::decode($line);
-        my ($w, $a, $a2, $m) = (split /\t/, $line)[1,6,7,13];
+        my ($w, $m, $a, $a2) = (split /\t/, $line)[1,9,10,11];
 
         $a = undef unless $a =~ /^\s*\d+\s*$/;
-        $a = $a2 if !defined $a && $a2 =~ /^\s*\d+\s*(?:$|;|,)/;
+        $a = $a2 if !defined $a && $a2 =~ /^\s*\d+\s*$/;
         $m = join "", grep { defined } $m =~ m{
             ( [\p{Hiragana}ー]+ )
           | ( \[Dev\] ) \P{Hiragana}* (っ?) \P{Hiragana}* ([きしちひぴくすつふぷ])
