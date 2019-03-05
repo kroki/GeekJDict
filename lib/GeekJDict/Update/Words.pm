@@ -537,7 +537,7 @@ sub _annotate_pronunciation {
         my ($w, $m, $a, $a2) = (split /\t/, $line)[1,9,10,11];
 
         $a = undef unless $a =~ /^\s*\d+\s*$/;
-        $a = $a2 if !defined $a && $a2 =~ /^\s*\d+\s*$/;
+        $a = $a2 if !defined $a && $a2 =~ /^\s*\d+\s*(?:$|;|,)/;
         $m = join "", grep { defined } $m =~ m{
             ( [\p{Hiragana}ー]+ )
           | ( \[Dev\] ) \P{Hiragana}* (っ?) \P{Hiragana}* ([きしちひぴくすつふぷ])
