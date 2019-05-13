@@ -516,7 +516,7 @@ sub show_tags {
     my $self = shift;
     my ($input) = @_;
 
-    my @globs = get_globs($input);
+    my @globs = get_globs($input, 1);
     if (@globs) {
         shift @globs if $globs[0] eq "";
     } else {
@@ -977,7 +977,7 @@ sub find_words {
         my @condition;
         foreach my $t (@tags) {
             $t =~ s/\*\*+/*/g;
-            my @g = get_globs($t);
+            my @g = get_globs($t, 1);
             @g = grep { !/^\*$/ && !/^\?\*$/ && !/^\*\?$/ && !/^\*\?\*$/ } @g;
             if (@g) {
                 my @c;
