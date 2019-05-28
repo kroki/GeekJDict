@@ -215,8 +215,9 @@ L<Hepburn|https://en.wikipedia.org/wiki/Hepburn_romanization> and
 L<Nihon-shiki|https://en.wikipedia.org/wiki/Nihon-shiki_romanization>
 romanizations, with the constraint that each kana character has
 exactly one romaji spelling (so that conversions between alphabets are
-always unambiguous).  All spellings are natural, except for づ and ぢ
-which are spelled "dzu" and "dji" respectively.
+always unambiguous, except for ん which is always mapped to m before
+m, p, b).  All spellings are natural, except for づ and ぢwhich are
+spelled "dzu" and "dji" respectively.
 
 There are three input modes corresponding to Latin, hiragana and
 katakana alphabets, and enabled by C<M-g>, C<M-h> and C<M-k> keys
