@@ -61,7 +61,6 @@ sub new {
     coloralias("tag",         "bright_black") unless coloralias("tag");
     coloralias("text",        "clear")        unless coloralias("text");
     coloralias("devoiced",    "bright_black") unless coloralias("devoiced");
-    coloralias("nonfricative","cyan")         unless coloralias("nonfricative");
     coloralias("particle",    "yellow")       unless coloralias("particle");
 
     $self->{superscript} = $option->{"large-references"}
