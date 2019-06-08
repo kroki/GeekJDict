@@ -24,7 +24,7 @@ use strict;
 use warnings qw(all);
 
 
-our @VERSION_KANJI_WRITING_WORDS = (0, 0, 1);
+our @VERSION_KANJI_WRITING_WORDS = (0, 0, 2);
 
 my %version_key = (
     kanji => 0,
