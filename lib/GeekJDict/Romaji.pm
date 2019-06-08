@@ -91,16 +91,11 @@ BEGIN {
         # Plosive.
         ぱ => "pa", ぴ =>  "pi", ぷ =>  "pu", ぺ => "pe", ぽ => "po",
 
-        # ん as m before m, p, b.
-        んま => "mma", んみ =>  "mmi", んむ =>  "mmu", んめ => "mme", んも => "mmo",
-        んば => "mba", んび =>  "mbi", んぶ =>  "mbu", んべ => "mbe", んぼ => "mbo",
-        んぱ => "mpa", んぴ =>  "mpi", んぷ =>  "mpu", んぺ => "mpe", んぽ => "mpo",
-
         # Prolonged sound mark.
         ー => "--"
     );
     # Diphthongs.
-    foreach my $mora (qw(き       に ひ み り ぎ       び ぴ  んみ んび んぴ)) {
+    foreach my $mora (qw(き       に ひ み り ぎ       び ぴ)) {
         $romaji{"${mora}ゃ"} = substr($romaji{$mora}, 0, -1) . "ya";
         $romaji{"${mora}ゅ"} = substr($romaji{$mora}, 0, -1) . "yu";
         $romaji{"${mora}ょ"} = substr($romaji{$mora}, 0, -1) . "yo";
