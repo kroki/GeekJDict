@@ -102,8 +102,6 @@ Additionally, certain morae may be highlighted in the following cases:
 
 =item * devoiced vowel in one of き, し, ち, ひ, ぴ or く, す, つ, ふ, ぷ
 
-=item * non-fricative consonant in が, ぎ, ぐ, げ, ご
-
 =item * は or へ particles that are read as わ or え respectively
 
 =back
@@ -626,7 +624,7 @@ Use custom colors.  Argument should be a comma-separated list of
 C<I<KEY>=I<COLOR>> assignments, where each I<KEY> is one of:
 
     separator       writing       reading       tag       text
-    devioced              nonfricative                particle
+    devioced        particle
 
 and each I<COLOR> is a name of ANSI color:
 
@@ -698,7 +696,7 @@ translations).
 
 F<WaDokuDa.tab> can be obtained from L<https://github.com/WaDoku/WaDokuJT-Data>
 (optional but highly recommended pronunciation info (accent, devoiced,
-non-fricative, particle marks)).
+particle marks)).
 
 =back
 

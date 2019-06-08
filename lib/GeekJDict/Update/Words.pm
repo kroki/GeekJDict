@@ -85,14 +85,13 @@ sub _create_tables {
     #         i 4 - ant
     #         i 5 - s_inf
     #         i 6 - lsource
-    #         i 7 - pronunciation info (accent, devoiced, non-fricative, etc.)
+    #         i 7 - pronunciation info (accent, devoiced, particle, etc.)
     #  tx - keb/reb/xref/ant/s_inf/lsource/glosses text, or pronunciation
     #       info as a sequence of Unicode character codes each encoding
     #       offset[*:2], type[1:0], where type is:
     #         i 0 - accent downstep (between morae)
     #         i 1 - devoiced i or u sound
-    #         i 2 - non-fricative g sound
-    #         i 3 - は or へ particle read as わ or え respectively
+    #         i 2 - は or へ particle read as わ or え respectively
     #  jr - re_restr/stagk/stagr/sense as a list of references to it (each
     #       Unicode character code is a reference to it, id is implicit).
     #  mr - metadata as a list of references to word_meta.id (each
@@ -541,7 +540,6 @@ sub _annotate_pronunciation {
         $m = join "", grep { defined } $m =~ m{
             ( [\p{Hiragana}ー]+ )
           | ( \[Dev\] ) \P{Hiragana}* (っ?) \P{Hiragana}* ([きしちひぴくすつふぷ])
-          | ( \[NN\] )  \P{Hiragana}* (っ?) \P{Hiragana}* ([がぎぐげご])
           | ( \[Jo\] )  \P{Hiragana}* ([はへ])
         }xg;
         my @r = $m =~ /(\p{Hiragana}[ゃゅょ]?|ー)/g;
@@ -561,10 +559,8 @@ sub _annotate_pronunciation {
             foreach my $m (split /\[([^]]+)\]/, $m) {
                 if ($m eq "Dev") {
                     $p .= pack "U", $o << 2 | 1;
-                } elsif ($m eq "NN") {
-                    $p .= pack "U", $o << 2 | 2;
                 } elsif ($m eq "Jo") {
-                    $p .= pack "U", $o << 2 | 3;
+                    $p .= pack "U", $o << 2 | 2;
                 } else {
                     $o += length $m;
                 }

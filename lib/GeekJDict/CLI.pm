@@ -1120,7 +1120,7 @@ sub print_japanese {
                 $p >>= 2;
                 ++$p;
                 my $color =
-                    color(qw(underline devoiced nonfricative particle)[$t]);
+                    color(qw(underline devoiced particle)[$t]);
                 my $reset = TOPCOLOR;
                 if ($t == 0) {
                     # Accent comes first and there no colors yet.
