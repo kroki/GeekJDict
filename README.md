@@ -123,7 +123,7 @@ Attribution-Share Alike 3.0
 [license](http://creativecommons.org/licenses/by-sa/3.0/).
 
 [Unihan](http://www.unicode.org/charts/unihan.html) data files are
-copyright © 1991-2017 Unicode, Inc. and distributed under the [Terms
+copyright © 1991-2019 Unicode, Inc. and distributed under the [Terms
 of Use](http://www.unicode.org/copyright.html).
 
 [cangjie5.txt](https://github.com/definite/ibus-table-chinese/tree/master/tables/cangjie)
