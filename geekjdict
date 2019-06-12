@@ -313,7 +313,7 @@ know the pronunciation either.
 
 For such a case GeekJDict implements L<Cangjie input
 method|https://en.wikipedia.org/wiki/Cangjie_input_method> (with a
-slight variation that "X" and "Z" codes are never used).  If you read
+slight variation that "X" is never used in kanji codes).  If you read
 Wikipedia article now (which you don't have to but which won't harm
 either) do not try to memorize any part of it, this will happen
 naturally as you use the method.  Suffices to say that Cangjie input
@@ -336,6 +336,8 @@ variants.  You can see the bindings by pressing C<M-C> (note the
 capital "C").
 
 =item * Cangjie code consists of one to five upper-case letters.
+
+=item * Special codes begin with "Z" (and may contain "X").
 
 =item * Cangjie decomposition rules are as follows (copied from
 L<Wikipedia|https://en.wikipedia.org/wiki/Cangjie_input_method#The_basic_rules>):

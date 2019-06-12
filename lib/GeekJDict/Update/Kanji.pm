@@ -453,6 +453,9 @@ sub _populate {
         $self->{cangjie_insert}->execute($kc, 8 | keys %$$cangjie, $tx);
     }
 
+    # Add one special codes: ZZ for 々 (U+3005).
+    $self->{cangjie_insert}->execute(0x3005, 1, "ZZ");
+
     while (my $line = $self->{unihan_radical}->getline) {
         next if $line =~ /^\s*(?:#|$)/;
         my ($uc, $fi, $tx) = split /\t/, $line, 3;
