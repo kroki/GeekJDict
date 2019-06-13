@@ -91,6 +91,10 @@ BEGIN {
         # Plosive.
         ぱ => "pa", ぴ =>  "pi", ぷ =>  "pu", ぺ => "pe", ぽ => "po",
 
+        # Obsolete but occasionally seen.
+        くゎ => "kwa",
+        ぐゎ => "gwa",
+
         # Prolonged sound mark.
         ー => "--"
     );
@@ -158,11 +162,11 @@ BEGIN {
     $katakana{vyo}  = "ヴョ";
     $katakana{kye}  = "キェ";
     $katakana{gye}  = "ギェ";
-    $katakana{kwa}  = "クァ";
+    $katakana{kwa}  = "クァ";  # Hiragana table has different spelling (くゎ).
     $katakana{kwi}  = "クィ";
     $katakana{kwe}  = "クェ";
     $katakana{kwo}  = "クォ";
-    $katakana{gwa}  = "グァ";
+    $katakana{gwa}  = "グァ";  # Hiragana table has different spelling (ぐゎ).
     $katakana{gwi}  = "グィ";
     $katakana{gwe}  = "グェ";
     $katakana{gwo}  = "グォ";
