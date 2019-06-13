@@ -137,8 +137,8 @@ BEGIN {
     }
 
     # Katakana digraphs from
-    # https://en.wikipedia.org/wiki/Hepburn_romanization#For_extended_katakana
-    # (blue take precedence over beige).
+    # https://en.wikipedia.org/wiki/Hepburn_romanization#Extended_katakana
+    # (blue takes precedence over beige).
     $katakana{yi}   = "イィ";
     $katakana{ye}   = "イェ";
     #$katakana{wa}   = "ウァ";  # JMdict seems to use original wa and wo.
@@ -158,7 +158,7 @@ BEGIN {
     $katakana{vyo}  = "ヴョ";
     $katakana{kye}  = "キェ";
     $katakana{gye}  = "ギェ";
-    $katakana{kwa}  = "クヮ";
+    $katakana{kwa}  = "クァ";
     $katakana{kwi}  = "クィ";
     $katakana{kwe}  = "クェ";
     $katakana{kwo}  = "クォ";
