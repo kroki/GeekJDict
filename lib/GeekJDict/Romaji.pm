@@ -212,6 +212,10 @@ BEGIN {
     #$katakana{le}   = "レ゜"; # "レﾟ";
     #$katakana{lo}   = "ロ゜"; # "ロﾟ";
 
+    # Add small ヵ and ヶ as a special case.
+    $katakana{xka}  = "ヵ";
+    $katakana{xke}  = "ヶ";
+
     # Finally add katakana to romaji map.
     while (my ($romaji, $mora) = each %katakana) {
         $romaji{$mora} = $romaji unless $romaji =~ /^[んン]/;

@@ -214,7 +214,9 @@ L<Nihon-shiki|https://en.wikipedia.org/wiki/Nihon-shiki_romanization>
 romanizations, with the constraint that each kana character has
 exactly one romaji spelling (so that conversions between alphabets are
 always unambiguous).  All spellings are natural, except for づ and ぢ
-which are spelled "dzu" and "dji" respectively.
+which are spelled "dzu" and "dji" respectively to avoid ambiguity with
+ず ("zu") and じ ("ji").  Plus there are two special cases: "xka" for ヵ
+and "xke" for ヶ (small versions of カ ("ka") and ケ ("ke") respectively).
 
 There are three input modes corresponding to Latin, hiragana and
 katakana alphabets, and enabled by C<M-g>, C<M-h> and C<M-k> keys
