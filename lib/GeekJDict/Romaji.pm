@@ -109,14 +109,6 @@ BEGIN {
         $romaji{"${mora}ゅ"} = substr($romaji{$mora}, 0, -1) . "u";
         $romaji{"${mora}ょ"} = substr($romaji{$mora}, 0, -1) . "o";
     }
-    # Geminates.
-    my %geminate;
-    while (my ($mora, $romaji) = each %romaji) {
-        if ($romaji =~ /^([kstcgzjdhfbp])/) {
-            $geminate{"っ$mora"} = "$1$romaji";
-        }
-    }
-    @romaji{keys %geminate} = values %geminate;
     # んあ => n'a, etc.
     foreach my $vowel (qw(あ い う え お  や ゆ よ)) {
         $romaji{"ん$vowel"} = "n'$romaji{$vowel}";
@@ -216,10 +208,26 @@ BEGIN {
     $katakana{xka}  = "ヵ";
     $katakana{xke}  = "ヶ";
 
-    # Finally add katakana to romaji map.
+    # Add katakana to romaji map.
     while (my ($romaji, $mora) = each %katakana) {
         $romaji{$mora} = $romaji unless $romaji =~ /^[んン]/;
     }
+
+    # Finally add hiragana and katakana geminates.
+    my %geminate;
+    while (my ($mora, $romaji) = each %romaji) {
+        if ($romaji =~ /^([kstcgzjdhfbp])/) {
+            my $geminate = "$1$romaji";
+            if ($mora =~ /^\p{Hiragana}/) {
+                $hiragana{$geminate} = "っ$mora";
+                $geminate{"っ$mora"} = $geminate;
+            } else {
+                $katakana{$geminate} = "ッ$mora";
+                $geminate{"ッ$mora"} = $geminate;
+            }
+        }
+    }
+    @romaji{keys %geminate} = values %geminate;
 }
 
 
