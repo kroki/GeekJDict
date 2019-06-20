@@ -542,11 +542,16 @@ sub _annotate_pronunciation {
           | ( \[Dev\] ) \P{Hiragana}* (っ?) \P{Hiragana}* ([きしちひぴくすつふぷ])
           | ( \[Jo\] )  \P{Hiragana}* ([はへ])
         }xg;
-        my @r = $m =~ /(\p{Hiragana}[ゃゅょ]?|ー)/g;
+        # Judging from the data WaDoku sometimes erroneously counts
+        # X[ぁぃぅぇぉゎ] as two morae, however in most cases it is correct.
+        my @r = $m =~ /(\p{Hiragana}[ぁぃぅぇぉゃゅょゎ]*|ー)/g;
         next unless (defined $a && $a <= @r) || $m =~ /\[/;
 
         # Fix cases when accent is mistakenly placed on っ (see 殺虫剤).
         ++$a if defined $a && $a > 0 && $a < @r && $r[$a-1] eq 'っ';
+
+        # Fix cases when accent is mistakenly plaed on ー (see ウェートレス).
+        --$a if defined $a && $a > 1 && $a <= @r && $r[$a-1] eq 'ー';
 
         my $p = "";
         # Accent MUST come first (see CLI.pm:print_japanese()).

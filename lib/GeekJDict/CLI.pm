@@ -1124,7 +1124,8 @@ sub print_japanese {
                 if ($t == 0) {
                     # Accent comes first and there no colors yet.
                     substr($tx, $p, 0, color("reset") . $reset);
-                    --$p if substr($tx, $p - 1, 1) =~ /[ゃゅょャュョ]/;
+                    --$p while (substr($tx, $p - 1, 1) =~
+                                /^[ぁぃぅぇぉゃゅょゎァィゥェォャュョヮ]/);
                     substr($tx, $p - 1, 0, $color);
                 } else {
                     $tx =~ s<
