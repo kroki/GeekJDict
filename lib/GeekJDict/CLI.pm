@@ -1172,7 +1172,7 @@ sub print_sense {
     my $superscript = $self->{superscript};
 
     # Part-of-speech (pos).
-    my @mr = unpack "U*", $sense->[2] if defined $sense->[2];
+    my @mr; @mr = unpack "U*", $sense->[2] if defined $sense->[2];
     my @ab;
     for (my $i = 0; $i < @mr; ++$i) {
         my $ki = $meta->[$mr[$i]][0];
