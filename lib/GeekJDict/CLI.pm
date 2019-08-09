@@ -324,7 +324,7 @@ sub _init_readline {
     $cangjie_help =~ s/(\p{Han}+|\p{CJK_Strokes}+)/color("writing")
                                                    . $1 . color("reset")/eg;
 
-    my $kana_inhibitor = qr/(?:^\s*t\s|(?:^|\s)t:)/;
+    my $kana_inhibitor = qr/:/;
     my $full_cangjie = qr/^\s*[hkw]\s/;
 
     use GeekJDict::ReadLine;
@@ -463,7 +463,7 @@ sub run {
     while (defined (my $input = $readline->readline)) {
         exit if $input eq "q";
         @$self{qw(height width)} = $readline->get_screen_size;
-        if ($input =~ s/^t(?:\s+|$)//) {
+        if ($input =~ s/^://) {
             $self->with_less(sub { $self->show_tags($input) });
         } elsif ($input =~ s/^h(?:\s+|$)//) {
             $self->with_less(sub { $self->{readline}->print_history($input) });
@@ -796,7 +796,7 @@ sub show_grammar {
             my $n = pop @$node;
             $n->[0] .= " " if $n->[0];
             print($indent, color("separator"), "see $n->[0]",
-                  color("reset"), "$word t: $n->[1]\n");
+                  color("reset"), "$word:$n->[1]\n");
         }
         foreach my $n (@$node) {
             my ($w, $f) = splice @$n, 0, 2;
@@ -931,7 +931,7 @@ sub find_words {
     my $self = shift;
     my ($query) = @_;
 
-    my ($globs, @tags) = split /(?:^|\s+)t:\s*/, $query;
+    my ($globs, @tags) = split /\s*:\s*/, $query;
     $globs = "" unless defined $globs;
 
     my $dbh = $self->{dbh};
@@ -997,7 +997,7 @@ sub find_words {
         @ids = sort { $a <=> $b } @ids;
     }
 
-    if (@ids && $query =~ /(?:^|\s+)t:/) {
+    if (@ids && $query =~ /:/) {
         my @condition;
         foreach my $t (@tags) {
             $t =~ s/\*\*+/*/g;

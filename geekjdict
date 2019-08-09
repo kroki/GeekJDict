@@ -65,26 +65,26 @@ doesn't end in hiragana, and there's also a word that starts with
 and there may also be non-matching words in the dictionary entry of
 course.
 
-Word lookups can also take tag filters that follow "t:" separator.  For
+Word lookups can also take tag filters that follow ":" separator.  For
 example the following two queries
 
-  geekjdict>> *[^あ-ん]*い  t: adj-na  t: nf* spec* ichi*
-  geekjdict>> *い   t:uk    t: adj-na  t: nf* spec* ichi*
+  geekjdict>> *[^あ-ん]*い  : adj-na  : nf* spec* ichi*
+  geekjdict>> *い    :uk    : adj-na  : nf* spec* ichi*
 
 will list all common な-adjectives that look like い-adjectives (i.e. either
 their writing ends in い, or they are usually written in kana alone and their
-reading ends in い).  All "t:" filters are ANDed, while tags within each "t:"
+reading ends in い).  All ":" filters are ANDed, while tags within each ":"
 are ORed (hence last query above will show entries that have a word ending
 in い, and there's "uk" tag, and there's "adj-na" tag, and there's at least
 one of nf01..48 or spec1/2 or ichi1/2 tags).  And here is a query for common
 godan verbs that look like ichidan verbs (end in ぃる or ぇる):
 
-  geekjdict>> *[いきしちにひみりえけせてねへめれ]る t:v5r t:nf* spec* ichi*
+  geekjdict>> *[いきしちにひみりえけせてねへめれ]る :v5r :nf* spec* ichi*
 
 Lookups with tag filter may take a bit more time to execute, especially when
 query yields lots of matches, like
 
-  geekjdict>> * t:n
+  geekjdict>> * :n
 
 but such queries aren't used very often.
 
@@ -115,7 +115,7 @@ below (command names are case-sensitive):
 
 =over
 
-=item C<t [TAG...]>
+=item C<: [TAG...]>
 
 Show tags description.  You may provide one or more tags (or none to
 see descriptions for all tags).  Tags may be separated by any symbols,
@@ -124,11 +124,11 @@ previous output.  For instance the first entry of the "Japanese
 language" query has "n; adj-no" before the first sense, so now we may
 type
 
-  geekjdict>> t n; adj-no
+  geekjdict>> : n; adj-no
 
 to see what it all means.  It's possible to use glob patterns as well:
 
-  geekjdict>> t n n-*
+  geekjdict>> : n n-*
 
 =item C<k KANJI...>
 

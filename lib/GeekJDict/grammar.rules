@@ -142,7 +142,7 @@
 #
 #   (書く, v5k, plain)
 #
-# and the query "書く t: v5k" finds the word in dictionary (it should
+# and the query "書く:v5k" finds the word in dictionary (it should
 # be noted that database query is performed at each step of the
 # inference process, but this is the first time in our example that
 # the word is actually found in the database).  So the user will see
@@ -154,7 +154,7 @@
 #      書いている is the continuous form of 書いて
 #       書いて is the て-form of 書いた
 #        書いた is the past form of 書く
-#         see plain 書く t: v5k
+#         see plain 書く:v5k
 #
 #
 # Below is a list of part-of-speech tags that may be used in rules
@@ -166,7 +166,7 @@
 #        WHERE ki = 'pos' AND ds NOT LIKE '% (archaic)'
 #        ORDER BY ab"
 #
-#  use "* t:<tag>" queries in GeekJDict to see examples of each):
+#  use "*:<tag>" queries in GeekJDict to see examples of each):
 #
 # adj-f      noun or verb acting prenominally
 # adj-i      adjective (keiyoushi)
