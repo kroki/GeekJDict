@@ -172,6 +172,10 @@ grammar file.  And you are always welcome to contribute new rules!
 Play back pronunciation samples for matching words.  See
 C<--pronounce-db> option below for details.
 
+=item C<j ID...>
+
+Lookup words by JMdict numeric IDs (C<ent_seq> field in XML).
+
 =item C<h [GLOB...]>
 
 Show command history.  Note that commands starting with whitespace are

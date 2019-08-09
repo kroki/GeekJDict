@@ -385,6 +385,11 @@ sub _prepare_statements {
         WHERE cc = ?
         ORDER BY sn
     });
+    $self->{select_id} = $dbh->prepare(q{
+        SELECT id
+        FROM entry_id
+        WHERE es = ?-999999
+    });
 }
 
 
@@ -473,8 +478,12 @@ sub run {
             my $break;
             local $SIG{INT} = sub { $break = 1 };
             $self->pronounce_words($input, \$break);
+        } elsif ($input =~ s/^j(?:\s+|$)//) {
+            my $ids = $self->find_ids($input);
+            $self->with_less(sub { $self->lookup_words($ids) });
         } else {
-            $self->with_less(sub { $self->lookup_words($input) });
+            my $ids = $self->find_words($input);
+            $self->with_less(sub { $self->lookup_words($ids) });
         }
     }
     print "\n";
@@ -872,11 +881,27 @@ sub pronounce_words {
 }
 
 
-sub lookup_words {
+sub find_ids {
     my $self = shift;
     my ($query) = @_;
 
-    my $ids = $self->find_words($query);
+    my $dbh = $self->{dbh};
+
+    my %entry;
+    @entry { $query =~ /(\d+)/g } = ();
+    my @ids;
+    foreach my $e (keys %entry) {
+        my $id = $dbh->selectrow_array($self->{select_id}, undef, $e);
+        push @ids, $id if $id;
+    }
+
+    return \@ids;
+}
+
+
+sub lookup_words {
+    my $self = shift;
+    my ($ids) = @_;
 
     my $count = @$ids;
     unless ($count) {

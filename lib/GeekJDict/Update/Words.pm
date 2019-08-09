@@ -37,6 +37,7 @@ sub new {
     @{$self->{lang}}{ @{$option->{lang}} } = () if $option->{lang};
 
     $self->{word_id} = 1000000;  # Leave room for renumbering.
+    $self->{entry_id} = {};
 
     if ($wadoku) {
         open(my $fh, ($wadoku =~ /\.gz$/ ? "<:gzip" : "<"), $wadoku)
@@ -112,6 +113,21 @@ sub _create_tables {
         INSERT INTO word (id, it, tx, jr, mr)
         VALUES (?, ?, ?, ?, ?)
     });
+
+    # entry_id table:
+    #  es - JMdict ent_seq minus 999999.
+    #  id - word.id.
+    $dbh->do(q{ DROP TABLE IF EXISTS entry_id });
+    $dbh->do(q{
+        CREATE TABLE entry_id (
+            es INTEGER NOT NULL PRIMARY KEY,
+            id INTEGER NOT NULL
+        )
+    });
+    $self->{entry_id_insert} = $dbh->prepare(q{
+        INSERT INTO entry_id (es, id)
+        VALUES (?-999999, ?)
+    });
 }
 
 
@@ -177,7 +193,8 @@ sub _init_parser {
     my %parser = (
         ent_seq      => sub { $self->_process_word(\%word) if %word;
                               %word = ();
-                              $group = \%word; },
+                              $group = \%word;
+                              $set_xml->(@_); },
          keb         => sub { $append_group->("k_ele"); $set_xml->(@_); },
           ke_inf     => $append_reference,
           ke_pri     => $append_priority,
@@ -238,6 +255,7 @@ sub _process_word {
     my ($word) = @_;
 
     my $id = ++$self->{word_id};
+    $self->{entry_id}{$id} = $word->{ent_seq};
 
     my $keb_it = 0;
     my $reb_it = 1;
@@ -452,8 +470,10 @@ sub _reorder {
         SET id = ?+1
         WHERE id = ?
     });
+    my $entry_id = $self->{entry_id};
     while (my @r = each @$order) {
         $renumber->execute(@r);
+        $self->{entry_id_insert}->execute($$entry_id{$r[1]}, $r[0] + 1);
     }
 }
 
