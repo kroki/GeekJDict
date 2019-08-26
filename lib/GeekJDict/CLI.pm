@@ -482,8 +482,14 @@ sub run {
             my $ids = $self->find_ids($input);
             $self->with_less(sub { $self->lookup_words($ids) });
         } else {
-            my $ids = $self->find_words($input);
-            $self->with_less(sub { $self->lookup_words($ids) });
+            $self->with_less(sub {
+                if ($input =~ /^\s*\S+\s*$/) {
+                    my $word = $self->show_grammar($input, 1);
+                    $input = $word if defined $word;
+                }
+                my $ids = $self->find_words($input);
+                $self->lookup_words($ids)
+            });
         }
     }
     print "\n";
@@ -782,21 +788,25 @@ sub polybezier {
 
 sub show_grammar {
     my $self = shift;
-    my ($query) = @_;
+    my ($query, $top_silent) = @_;
 
     my $node = $self->{grammar}->infer_backward($query);
     my $word = shift @$node;
-    print_node($word, $node, 1) if @$node;
+    my $res; $res = print_node($word, $node, 1, $top_silent) if @$node;
+    return $res;
 
     sub print_node {
-        my ($word, $node, $depth) = @_;
+        my ($word, $node, $depth, $top_silent) = @_;
 
+        my $res;
         my $indent = " " x $depth;
         if (@{$node->[-1]} == 2) {
             my $n = pop @$node;
             $n->[0] .= " " if $n->[0];
             print($indent, color("separator"), "see $n->[0]",
-                  color("reset"), "$word:$n->[1]\n");
+                  color("reset"), "$word:$n->[1]\n")
+                unless $top_silent && $depth == 1 && !@$node;
+            $res = "$word:$n->[1]";
         }
         foreach my $n (@$node) {
             my ($w, $f) = splice @$n, 0, 2;
@@ -804,8 +814,10 @@ sub show_grammar {
             print($indent, color("writing"), $word,
                   color("separator"), " is the $f of ", color("writing"), $w,
                   color("reset"), "\n");
-            print_node($w, $n, $depth + 1);
+            my $r = print_node($w, $n, $depth + 1, $top_silent);
+            $res //= $r;
         }
+        return $res;
     }
 }
 
