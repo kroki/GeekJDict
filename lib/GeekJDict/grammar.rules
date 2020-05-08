@@ -544,3 +544,14 @@ without-doing 〜ないで for negative 〜ない v[15]* vk vs-*
 without-doing 〜ず for negative 〜ない v[15]* vk
 without-doing 〜せず for negative 〜しない vs-[ics]
 without-doing 〜せず for negative 〜さない vs-[cs]
+
+
+#### guessing at an outcome (〜そう)
+
+outcome-guess 〜そう for plain 〜る v1*
+outcome-guess 〜イそう for plain 〜ウ v5* vk vs-*
+outcome-guess 〜そう for plain 〜い adj-i
+outcome-guess 〜なさそう for plain 〜ない adj-i  # 〜ない-derived i-adjectives
+outcome-guess 〜よさそう adj-i for plain 〜いい adj-ix
+outcome-guess 〜そう for plain 〜 adj-na*
+outcome-guess 〜さそう for negative 〜い *
