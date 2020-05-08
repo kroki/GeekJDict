@@ -555,3 +555,9 @@ outcome-guess 〜なさそう for plain 〜ない adj-i  # 〜ない-derived i-a
 outcome-guess 〜よさそう adj-i for plain 〜いい adj-ix
 outcome-guess 〜そう for plain 〜 adj-na*
 outcome-guess 〜さそう for negative 〜い *
+
+
+#### 気-appearance
+
+気-appearance 〜げ adj-na for plain 〜い adj-i
+気-appearance 〜げ adj-na for plain 〜 n* pn
